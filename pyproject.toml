@@ -1,0 +1,13 @@
+[build-system]
+requires = [
+    "setuptools>=42",
+    "wheel",
+    "algo-ops",
+    "easyocr",
+    "pytesseract",
+    "opencv-python-headless==4.5.4.60",
+    "numpy",
+    "natsort",
+    "pyspellchecker"
+]
+build-backend = "setuptools.build_meta"
