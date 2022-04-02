@@ -6,7 +6,7 @@ from natsort import natsorted
 
 
 def run_os_command(
-        command: List[str], squelch_output: bool = False
+    command: List[str], squelch_output: bool = False
 ) -> Tuple[Optional[str], int]:
     """
     Runs a safe operating system command.
@@ -92,6 +92,10 @@ def get_image_files(images_dir: str) -> List[str]:
     return: Image file paths
     """
     files = natsorted(
-        [os.path.join(images_dir, file) for file in os.listdir(images_dir)]
+        [
+            os.path.join(images_dir, file)
+            for file in os.listdir(images_dir)
+            if is_image_file(file_path=file)
+        ]
     )
     return files
