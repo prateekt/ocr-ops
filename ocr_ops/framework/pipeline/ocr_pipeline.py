@@ -1,4 +1,3 @@
-import os
 from typing import Optional, Dict, Any, List, Union
 
 import cv2
@@ -6,9 +5,8 @@ from algo_ops.ops.op import Op
 from algo_ops.paraloop import paraloop
 from algo_ops.pipeline.cv_pipeline import CVPipeline
 from algo_ops.pipeline.pipeline import Pipeline
-from natsort import natsorted
 
-from ocr_ops.dependency import sys_util
+from ocr_ops.dependency.sys_util import get_image_files
 from ocr_ops.framework.op.ocr_op import OCRMethod, OCROp
 
 
@@ -19,20 +17,6 @@ class OCRPipeline(Pipeline):
     text post-processing pipeline to clean noisy OCR-ed text results to return a final robust
     callset of OCR-ed text from an image.
     """
-
-    @staticmethod
-    def get_image_files(images_dir: str) -> List[str]:
-        """
-        Get image paths for images in an images directory.
-
-        param images_dir: The images directory
-
-        return: Image file paths
-        """
-        files = natsorted(
-            [os.path.join(images_dir, file) for file in os.listdir(images_dir)]
-        )
-        return files
 
     def __init__(
         self,
@@ -116,13 +100,7 @@ class OCRPipeline(Pipeline):
         return:
             output: List of OCR results
         """
-        files = natsorted(
-            [
-                os.path.join(images_dir, file)
-                for file in os.listdir(images_dir)
-                if sys_util.is_image_file(file_path=file)
-            ]
-        )
+        files = get_image_files(images_dir=images_dir)
         results = paraloop.loop(
             func=self.run_on_img_file, params=files, mechanism=mechanism
         )

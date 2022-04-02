@@ -1,9 +1,12 @@
+import os
 import subprocess
 from typing import List, Optional, Tuple
 
+from natsort import natsorted
+
 
 def run_os_command(
-    command: List[str], squelch_output: bool = False
+        command: List[str], squelch_output: bool = False
 ) -> Tuple[Optional[str], int]:
     """
     Runs a safe operating system command.
@@ -78,3 +81,17 @@ def is_video_file(file_path: str) -> bool:
         True if file is video file
     """
     return file_path.lower().endswith((".mp4", ".aiff", ".avi", ".mov", ".mkv"))
+
+
+def get_image_files(images_dir: str) -> List[str]:
+    """
+    Get image paths for images in an images directory.
+
+    param images_dir: The images directory
+
+    return: Image file paths
+    """
+    files = natsorted(
+        [os.path.join(images_dir, file) for file in os.listdir(images_dir)]
+    )
+    return files
