@@ -21,14 +21,15 @@ class FFMPEGOp(Op):
 
         """
         success, image_frames_path = FFMPEG.convert_video_to_frames(
-            video_path=video_path, out_path=self.out_path
+            video_path=video_path, out_path=self.out_path, fps=self.fps
         )
         if not success:
             raise SystemError("FFMPEG conversion failed on " + str(video_path))
         return image_frames_path
 
-    def __init__(self, out_path: Optional[str] = None):
+    def __init__(self, out_path: Optional[str] = None, fps: int = 10):
         self.out_path = out_path
+        self.fps = fps
         super().__init__(func=self._convert_to_images_wrapper)
 
     def vis(self) -> None:
