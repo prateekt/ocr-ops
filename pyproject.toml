@@ -8,6 +8,7 @@ requires = [
     "opencv-python-headless==4.5.4.60",
     "numpy",
     "natsort",
-    "pyspellchecker"
+    "pyspellchecker",
+    "shapely"
 ]
 build-backend = "setuptools.build_meta"

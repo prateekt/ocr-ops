@@ -2,7 +2,7 @@ import os
 import uuid
 from typing import Optional
 
-from ocr_ops.dependency.sys_util import run_os_command, check_if_installed
+from algo_ops.dependency.sys_util import run_os_command, check_if_installed
 
 
 class FFMPEG:
@@ -16,11 +16,11 @@ class FFMPEG:
 
     @staticmethod
     def convert_video_to_frames(
-        video_path: str,
-        out_path: Optional[str] = None,
-        fps: int = 10,
-        fmt: str = "out%04d.png",
-        squelch_output: bool = True,
+            video_path: str,
+            out_path: Optional[str] = None,
+            fps: int = 10,
+            fmt: str = "out%04d.png",
+            squelch_output: bool = True,
     ) -> [bool, str]:
         """
         Converts video to frames. Returns true if conversion succeeded.
