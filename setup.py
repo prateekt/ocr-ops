@@ -7,10 +7,10 @@ with open("requirements.txt") as f:
 
 setuptools.setup(
     name="ocr-ops",
-    version="0.0.0.3",
+    version="0.0.0.3.1",
     author="Prateek Tandon",
     author_email="prateek1.tandon@gmail.com",
-    description="OCR-Ops Pipeline",
+    description="OCR-Ops",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/prateekt/ocr-ops",
