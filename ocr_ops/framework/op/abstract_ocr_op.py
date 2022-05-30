@@ -86,8 +86,8 @@ class AbstractOCROp(Op, ABC):
         return ocr_result
 
     def __init__(
-            self,
-            supported_languages: Tuple[str],
+        self,
+        supported_languages: Tuple[str],
     ):
         """
         Constructor for Abstract OCROp.
@@ -215,8 +215,8 @@ class EasyOCROp(AbstractOCROp, ABC):
     """
 
     def __init__(
-            self,
-            supported_languages: Tuple[str] = ("en",),
+        self,
+        supported_languages: Tuple[str] = ("en",),
     ):
         """
         param supported_languages: The languages to support in OCR

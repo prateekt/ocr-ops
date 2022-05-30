@@ -10,7 +10,7 @@ from ocr_ops.framework.struct.ocr_result import OCRResult
 
 
 def _extract_confident_text_from_ocr_result(
-        ocr_result: Union[OCRResult, str, List[str]]
+    ocr_result: Union[OCRResult, str, List[str]]
 ) -> List[str]:
     if isinstance(ocr_result, str):
         return [ocr_result]

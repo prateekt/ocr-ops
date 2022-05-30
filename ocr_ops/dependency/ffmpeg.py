@@ -16,11 +16,11 @@ class FFMPEG:
 
     @staticmethod
     def convert_video_to_frames(
-            video_path: str,
-            out_path: Optional[str] = None,
-            fps: int = 10,
-            fmt: str = "out%04d.png",
-            squelch_output: bool = True,
+        video_path: str,
+        out_path: Optional[str] = None,
+        fps: int = 10,
+        fmt: str = "out%04d.png",
+        squelch_output: bool = True,
     ) -> [bool, str]:
         """
         Converts video to frames. Returns true if conversion succeeded.

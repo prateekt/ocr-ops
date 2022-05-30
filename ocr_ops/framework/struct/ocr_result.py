@@ -11,10 +11,10 @@ class TextBox:
     """
 
     def __init__(
-            self,
-            text: str,
-            bounding_box: Optional[Polygon] = None,
-            conf: Optional[float] = None,
+        self,
+        text: str,
+        bounding_box: Optional[Polygon] = None,
+        conf: Optional[float] = None,
     ):
         """
         param text: OCR-ed text
@@ -72,7 +72,7 @@ class OCRResult:
     """
 
     def __init__(
-            self, text_boxes: List[TextBox], input_img: np.array, use_bounding_box: bool
+        self, text_boxes: List[TextBox], input_img: np.array, use_bounding_box: bool
     ):
         """
         Initialize OCRResult

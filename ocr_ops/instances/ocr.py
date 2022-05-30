@@ -22,8 +22,8 @@ def basic_ocr_pipeline() -> OCRPipeline:
 
 
 def basic_ocr_with_text_cleaning_pipeline(
-        vocab_words: Set[str],
-        ocr_method: OCRMethod = OCRMethod.PYTESSERACT,
+    vocab_words: Set[str],
+    ocr_method: OCRMethod = OCRMethod.PYTESSERACT,
 ) -> OCRPipeline:
     """
     Initializes basic PyTesseract pipeline with basic text cleaning pipeline.
@@ -69,7 +69,7 @@ def _invert_back(img: np.array) -> np.array:
 
 
 def black_text_ocr_pipeline(
-        ocr_method: OCRMethod = OCRMethod.PYTESSERACT,
+    ocr_method: OCRMethod = OCRMethod.PYTESSERACT,
 ) -> OCRPipeline:
     """
     Initializes pipeline to OCR black text.
@@ -88,7 +88,7 @@ def black_text_ocr_pipeline(
 
 
 def white_text_ocr_pipeline(
-        ocr_method: OCRMethod = OCRMethod.PYTESSERACT,
+    ocr_method: OCRMethod = OCRMethod.PYTESSERACT,
 ) -> OCRPipeline:
     """
     Initializes pipeline to OCR white text.

@@ -21,8 +21,8 @@ class PyTesseractTextOCROp(PyTesseractOp, TextOCROp):
     """
 
     def __init__(
-            self,
-            supported_languages: Tuple[str] = ("eng",),
+        self,
+        supported_languages: Tuple[str] = ("eng",),
     ):
         """
         param supported_languages: The languages to support in OCR
@@ -49,8 +49,8 @@ class PyTesseractTextBoxOCROp(PyTesseractOp, TextBoxOCROp):
     """
 
     def __init__(
-            self,
-            supported_languages: Tuple[str] = ("eng",),
+        self,
+        supported_languages: Tuple[str] = ("eng",),
     ):
         """
         param supported_languages: The languages to support in OCR
@@ -90,8 +90,8 @@ class EasyOCRTextOp(EasyOCROp, TextOCROp):
     """
 
     def __init__(
-            self,
-            supported_languages: Tuple[str] = ("en",),
+        self,
+        supported_languages: Tuple[str] = ("en",),
     ):
         """
         param supported_languages: The languages to support in OCR
@@ -118,8 +118,8 @@ class EasyOCRTextBoxOp(EasyOCROp, TextBoxOCROp):
     """
 
     def __init__(
-            self,
-            supported_languages: Tuple[str] = ("en",),
+        self,
+        supported_languages: Tuple[str] = ("en",),
     ):
         """
         param supported_languages: The languages to support in OCR

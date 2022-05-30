@@ -1,6 +1,6 @@
 # ocr-ops
 
-OCR-Ops is infrastucture to perform Optimal Character Recognition (OCR) at scale on a large number of images and videos. Built on top of the algo-ops framework, ocr-ops is modular and extensible in its data processing operations.
+OCR-Ops is infrastucture to perform Optimal Character Recognition (OCR) at scale on a large number of images and videos. Built on top of the algo-ops framework, OCR-Ops is modular and extensible in its data processing operations.
 
 Key Features:
 

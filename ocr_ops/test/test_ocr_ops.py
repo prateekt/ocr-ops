@@ -177,10 +177,10 @@ class TestOCROps(unittest.TestCase):
             out_path="box_ocr_output", basename="pytesseract_ocr"
         )
         for file in (
-                "easy_ocr",
-                "easy_ocr_input",
-                "pytesseract_ocr",
-                "pytesseract_ocr_input",
+            "easy_ocr",
+            "easy_ocr_input",
+            "pytesseract_ocr",
+            "pytesseract_ocr_input",
         ):
             self.assertTrue(
                 os.path.exists(os.path.join("box_ocr_output", file + ".png"))

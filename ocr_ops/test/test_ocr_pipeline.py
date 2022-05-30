@@ -113,7 +113,7 @@ class TestOCRPipeline(unittest.TestCase):
         output_type=(OutputType.TEXT, OutputType.TEXTBOX),
     )
     def test_ocr_pipeline_with_basic_text_cleaning(
-            self, ocr_method: OCRMethod, output_type: OutputType
+        self, ocr_method: OCRMethod, output_type: OutputType
     ) -> None:
         """
         Test OCR pipeline with basic text cleaning.

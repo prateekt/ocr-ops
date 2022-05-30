@@ -60,11 +60,11 @@ class OCRPipeline(Pipeline):
             )
 
     def __init__(
-            self,
-            img_pipeline: Optional[CVPipeline],
-            ocr_method: OCRMethod,
-            output_type: OutputType,
-            text_pipeline: Optional[Pipeline],
+        self,
+        img_pipeline: Optional[CVPipeline],
+        ocr_method: OCRMethod,
+        output_type: OutputType,
+        text_pipeline: Optional[Pipeline],
     ):
         """
         param img_pipeline: An optional CVOps pre-processing pipeline to run on image before OCR
@@ -113,7 +113,7 @@ class OCRPipeline(Pipeline):
         self.text_pipeline.set_pipeline_params(func_name=func_name, params=params)
 
     def run_on_images(
-            self, images_dir: str, mechanism: str = "sequential"
+        self, images_dir: str, mechanism: str = "sequential"
     ) -> Union[List[str], List[List[str]]]:
         """
         API to run OCR on a directory of images.
