@@ -84,6 +84,10 @@ def _check_vocab(words: List[str], vocab_words: Set[str]) -> List[str]:
 
 
 class OCRResultUpdater:
+    """
+    Wrapper that allows updating of OCRResult TextBoxes using text processing functions.
+    """
+
     @classmethod
     def _updater(cls, function):
         @functools.wraps(function)
@@ -104,10 +108,21 @@ class OCRResultUpdater:
 
     @classmethod
     def prepare_updater(cls, base_func: Callable) -> Callable:
+        """
+        Prepares updater function that changes OCRResult based on text-processing function that operates on List[str].
+
+        param base_func: The base text-processing function.
+
+        return:
+            OCRResult Updater Function
+        """
         return cls._updater(base_func)
 
 
 def basic_text_cleaning_pipeline() -> Pipeline:
+    """
+    Sets up a basic data cleaning text pipeline preset.
+    """
     pipeline = Pipeline.init_from_funcs(
         [
             OCRResultUpdater.prepare_updater(base_func=base_func)
