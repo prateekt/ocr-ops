@@ -1,3 +1,4 @@
+import os.path
 from enum import Enum
 from typing import Optional, Dict, Any, List, Union
 
@@ -14,6 +15,7 @@ from ocr_ops.framework.op.ocr_op import (
     EasyOCRTextBoxOp,
     EasyOCRTextOp,
 )
+from ocr_ops.framework.struct.ocr_result import OCRResult
 
 
 class OCRMethod(Enum):
@@ -45,15 +47,17 @@ class OCRPipeline(Pipeline):
     """
 
     @staticmethod
-    def __setup_ocr_op(ocr_method: OCRMethod, output_type: OutputType) -> AbstractOCROp:
+    def __setup_ocr_op(
+        ocr_method: OCRMethod, output_type: OutputType, autosave_img_path: Optional[str]
+    ) -> AbstractOCROp:
         if ocr_method == OCRMethod.EASYOCR and output_type == OutputType.TEXT:
-            return EasyOCRTextOp()
+            return EasyOCRTextOp(autosave_img_path=autosave_img_path)
         elif ocr_method == OCRMethod.EASYOCR and output_type == OutputType.TEXTBOX:
-            return EasyOCRTextBoxOp()
+            return EasyOCRTextBoxOp(autosave_img_path=autosave_img_path)
         elif ocr_method == OCRMethod.PYTESSERACT and output_type == OutputType.TEXT:
-            return PyTesseractTextOCROp()
+            return PyTesseractTextOCROp(autosave_img_path=autosave_img_path)
         elif ocr_method == OCRMethod.PYTESSERACT and output_type == OutputType.TEXTBOX:
-            return PyTesseractTextBoxOCROp()
+            return PyTesseractTextBoxOCROp(autosave_img_path=autosave_img_path)
         else:
             raise ValueError(
                 "Unknown OCR Mode: " + str([str(ocr_method), str(output_type)])
@@ -65,18 +69,24 @@ class OCRPipeline(Pipeline):
         ocr_method: OCRMethod,
         output_type: OutputType,
         text_pipeline: Optional[Pipeline],
+        autosave_img_path: Optional[str] = None,
     ):
         """
         param img_pipeline: An optional CVOps pre-processing pipeline to run on image before OCR
         param ocr_method: The ocr method to use
         param output_type: The type (verbosity) of information output from OCR
         param text_pipeline: An optional TextOps pipeline to post-process OCR text
+        param autosave_img_path: If specified, the place where OCR output images will be auto-saved.
         """
         self.img_pipeline = img_pipeline
+        self.autosave_img_path = autosave_img_path
         self.ocr_op = self.__setup_ocr_op(
-            ocr_method=ocr_method, output_type=output_type
+            ocr_method=ocr_method,
+            output_type=output_type,
+            autosave_img_path=autosave_img_path,
         )
         self.text_pipeline = text_pipeline
+        self.parallel_mechanism: str = "sequential"
 
         # prepare ops list
         ops: List[Op] = list()
@@ -112,17 +122,28 @@ class OCRPipeline(Pipeline):
             raise ValueError("Cannot set parameters when text_pipeline=None.")
         self.text_pipeline.set_pipeline_params(func_name=func_name, params=params)
 
-    def run_on_images(
-        self, images_dir: str, mechanism: str = "sequential"
-    ) -> Union[List[str], List[List[str]]]:
+    def exec(self, inp: str) -> Union[OCRResult, List[OCRResult]]:
         """
-        API to run OCR on a directory of images.
+        API to run OCR on a single image or a directory of images.
 
-        param files_path: Path to directory of card image files
+        param inp: Path to single image file or directory containing image file(s)
 
         return:
             output: List of OCR results
         """
-        files = get_image_files(images_dir=images_dir)
-        results = paraloop.loop(func=self.exec, params=files, mechanism=mechanism)
-        return results
+        input_path = inp
+        if not os.path.exists(input_path):
+            raise ValueError("input_path " + str(input_path) + " does not exist.")
+        if os.path.isdir(input_path):
+            files = get_image_files(images_dir=input_path)
+            single_output = False
+        else:
+            single_output = True
+            files = [input_path]
+        results = paraloop.loop(
+            func=super().exec, params=files, mechanism=self.parallel_mechanism
+        )
+        if single_output:
+            return results[0]
+        else:
+            return results

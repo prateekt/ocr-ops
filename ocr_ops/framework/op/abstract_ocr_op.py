@@ -86,17 +86,35 @@ class AbstractOCROp(Op, ABC):
         return ocr_result
 
     def __init__(
-        self,
-        supported_languages: Tuple[str],
+        self, supported_languages: Tuple[str], autosave_img_path: Optional[str] = None
     ):
         """
         Constructor for Abstract OCROp.
 
         param supported_languages: The languages to support in OCR
+        param autosave_img_path: If specified, the place where OCR output images will be auto-saved.
         """
         self.supported_languages = supported_languages
+        self.autosave_img_path = autosave_img_path
         self.input_img: Optional[np.array] = None
         super().__init__(func=self.exec_ocr)
+
+    def exec(self, inp: Union[str, np.array]) -> Any:
+        """
+        Exec supporting autosave of outputs.
+
+        param inp: Op Input
+        return:
+            Op Output
+        """
+        if isinstance(inp, str):
+            basename = os.path.splitext(os.path.basename(inp))[0]
+        else:
+            basename = len(self.execution_times)
+        output = super().exec(inp=inp)
+        if self.autosave_img_path is not None:
+            self.save_output(out_path=self.autosave_img_path, basename=basename)
+        return output
 
 
 class TextOCROp(AbstractOCROp, ABC):
@@ -121,6 +139,7 @@ class TextOCROp(AbstractOCROp, ABC):
             if out_path.endswith(".txt"):
                 outfile = out_path
             else:
+                os.makedirs(out_path, exist_ok=True)
                 if basename is not None:
                     outfile = os.path.join(out_path, basename + ".txt")
                 else:
@@ -217,12 +236,15 @@ class EasyOCROp(AbstractOCROp, ABC):
     def __init__(
         self,
         supported_languages: Tuple[str] = ("en",),
+        autosave_img_path: Optional[str] = None,
     ):
         """
         param supported_languages: The languages to support in OCR
+        param autosave_img_path: If specified, the place where OCR output images will be auto-saved.
+
         """
         super().__init__(
-            supported_languages=supported_languages,
+            supported_languages=supported_languages, autosave_img_path=autosave_img_path
         )
         self.easy_ocr_reader: Optional[easyocr.Reader] = easyocr.Reader(
             lang_list=list(self.supported_languages)

@@ -26,6 +26,12 @@ class TextBox:
         self.conf: Optional[float] = conf
         self.words: List[str] = [text]
 
+    def __str__(self):
+        if self.bounding_box is not None and self.conf is not None:
+            return str([self.text, self.bounding_box.bounds, self.conf])
+        else:
+            return str([self.text])
+
     def overlap_area(self, other: "TextBox"):
         """
         Finds the overlap area between one text box's bounding box with another.
@@ -87,6 +93,9 @@ class OCRResult:
         self.output_img: np.array = self._prepare_output_image()
         self.words: List[str] = list()
         self.update_words()
+
+    def __str__(self):
+        return str([str(text_box) for text_box in self.text_boxes])
 
     def _prepare_output_image(self) -> np.array:
         """

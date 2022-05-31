@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 import numpy as np
 import pytesseract
@@ -23,11 +23,15 @@ class PyTesseractTextOCROp(PyTesseractOp, TextOCROp):
     def __init__(
         self,
         supported_languages: Tuple[str] = ("eng",),
+        autosave_img_path: Optional[str] = None,
     ):
         """
         param supported_languages: The languages to support in OCR
+        param autosave_img_path: If specified, the place where OCR output images will be auto-saved.
         """
-        super().__init__(supported_languages=supported_languages)
+        super().__init__(
+            supported_languages=supported_languages, autosave_img_path=autosave_img_path
+        )
 
     def run_ocr(self, img: np.array) -> OCRResult:
         """
@@ -51,11 +55,14 @@ class PyTesseractTextBoxOCROp(PyTesseractOp, TextBoxOCROp):
     def __init__(
         self,
         supported_languages: Tuple[str] = ("eng",),
+        autosave_img_path: Optional[str] = None,
     ):
         """
         param supported_languages: The languages to support in OCR
         """
-        super().__init__(supported_languages=supported_languages)
+        super().__init__(
+            supported_languages=supported_languages, autosave_img_path=autosave_img_path
+        )
 
     def run_ocr(self, img: np.array) -> OCRResult:
         """
@@ -92,11 +99,15 @@ class EasyOCRTextOp(EasyOCROp, TextOCROp):
     def __init__(
         self,
         supported_languages: Tuple[str] = ("en",),
+        autosave_img_path: Optional[str] = None,
     ):
         """
         param supported_languages: The languages to support in OCR
+        param autosave_img_path: If specified, the place where OCR output images will be auto-saved.
         """
-        super().__init__(supported_languages=supported_languages)
+        super().__init__(
+            supported_languages=supported_languages, autosave_img_path=autosave_img_path
+        )
 
     def run_ocr(self, img: np.array) -> OCRResult:
         """
@@ -120,11 +131,15 @@ class EasyOCRTextBoxOp(EasyOCROp, TextBoxOCROp):
     def __init__(
         self,
         supported_languages: Tuple[str] = ("en",),
+        autosave_img_path: Optional[str] = None,
     ):
         """
         param supported_languages: The languages to support in OCR
+        param autosave_img_path: If specified, the place where OCR output images will be auto-saved.
         """
-        super().__init__(supported_languages=supported_languages)
+        super().__init__(
+            supported_languages=supported_languages, autosave_img_path=autosave_img_path
+        )
 
     def run_ocr(self, img: np.array) -> OCRResult:
         """

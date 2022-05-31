@@ -14,14 +14,16 @@ from ocr_ops.framework.op.ocr_op import (
 class TestOCROps(unittest.TestCase):
     @staticmethod
     def _clean_env():
-        if os.path.exists("txt_ocr_output"):
-            shutil.rmtree("txt_ocr_output")
-        if os.path.exists("easy_ocr_profile"):
-            shutil.rmtree("easy_ocr_profile")
-        if os.path.exists("pytesseract_profile"):
-            shutil.rmtree("pytesseract_profile")
-        if os.path.exists("box_ocr_output"):
-            shutil.rmtree("box_ocr_output")
+        for direc in (
+            "txt_ocr_output",
+            "easy_ocr_profile",
+            "pytesseract_profile",
+            "box_ocr_output",
+            "easy_ocr_autosave",
+            "pytesseract_autosave",
+        ):
+            if os.path.exists(direc):
+                shutil.rmtree(direc)
 
     def setUp(self) -> None:
 
@@ -40,8 +42,8 @@ class TestOCROps(unittest.TestCase):
         """
 
         # init
-        easy_ocr_op = EasyOCRTextOp()
-        pytesseract_op = PyTesseractTextOCROp()
+        easy_ocr_op = EasyOCRTextOp(autosave_img_path="easy_ocr_autosave")
+        pytesseract_op = PyTesseractTextOCROp(autosave_img_path="pytesseract_autosave")
 
         # test that ops without inputs don't do much
         self.assertEqual(easy_ocr_op.input, None)
@@ -80,6 +82,13 @@ class TestOCROps(unittest.TestCase):
         output = pytesseract_op.exec(self.blank_card_img)
         self.assertTrue(isinstance(output, OCRResult))
         self.assertEqual(output.to_text_list(), [" \n\n \n"])
+        for autosave_file in ("blank_card.txt", "joy_of_data.txt"):
+            self.assertTrue(
+                os.path.exists(os.path.join("pytesseract_autosave", autosave_file))
+            )
+            self.assertTrue(
+                os.path.exists(os.path.join("easy_ocr_autosave", autosave_file))
+            )
 
         # test saving input / output
         easy_ocr_op.save_input(out_path="txt_ocr_output", basename="easy_ocr")
@@ -95,7 +104,6 @@ class TestOCROps(unittest.TestCase):
             self.assertTrue(
                 os.path.exists(os.path.join("txt_ocr_output", file + "_input.png"))
             )
-        shutil.rmtree("txt_ocr_output")
 
         # test visualizing profile
         easy_ocr_op.vis_profile(profiling_figs_path="easy_ocr_profile")
@@ -106,17 +114,17 @@ class TestOCROps(unittest.TestCase):
         self.assertTrue(
             os.path.exists(os.path.join("pytesseract_profile", "exec_ocr.png"))
         )
-        shutil.rmtree("easy_ocr_profile")
-        shutil.rmtree("pytesseract_profile")
 
-    def test_spatial_ocr_op(self) -> None:
+    def test_textbox_ocr_op(self) -> None:
         """
-        Test SpatialOCROp on test images.
+        Test TextBox OCR Ops on test images.
         """
 
         # init
-        easy_ocr_op = EasyOCRTextBoxOp()
-        pytesseract_op = PyTesseractTextBoxOCROp()
+        easy_ocr_op = EasyOCRTextBoxOp(autosave_img_path="easy_ocr_autosave")
+        pytesseract_op = PyTesseractTextBoxOCROp(
+            autosave_img_path="pytesseract_autosave"
+        )
 
         # test that ops without inputs don't do much
         self.assertEqual(easy_ocr_op.input, None)
@@ -185,7 +193,6 @@ class TestOCROps(unittest.TestCase):
             self.assertTrue(
                 os.path.exists(os.path.join("box_ocr_output", file + ".png"))
             )
-        shutil.rmtree("box_ocr_output")
 
         # test that nothing is detected in blank image
         output1: OCRResult = easy_ocr_op.exec(self.blank_card_img)
@@ -207,5 +214,12 @@ class TestOCROps(unittest.TestCase):
         self.assertTrue(
             os.path.exists(os.path.join("pytesseract_profile", "exec_ocr.png"))
         )
-        shutil.rmtree("easy_ocr_profile")
-        shutil.rmtree("pytesseract_profile")
+
+        # test autosave
+        for autosave_file in ("blank_card.png", "joy_of_data.png"):
+            self.assertTrue(
+                os.path.exists(os.path.join("pytesseract_autosave", autosave_file))
+            )
+            self.assertTrue(
+                os.path.exists(os.path.join("easy_ocr_autosave", autosave_file))
+            )
