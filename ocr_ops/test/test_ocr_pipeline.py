@@ -3,6 +3,7 @@ import shutil
 import unittest
 from typing import Callable
 
+import algo_ops.plot.settings as plot_settings
 import numpy as np
 from algo_ops.dependency.iter_params import iter_params
 from shapely.geometry import Polygon
@@ -68,7 +69,10 @@ class TestOCRPipeline(unittest.TestCase):
         # paths
         dir_path = os.path.dirname(os.path.realpath(__file__))
         self.joy_of_data_img = os.path.join(dir_path, "data", "joy_of_data.png")
+
+        # env
         self._clean_env()
+        plot_settings.SUPPRESS_PLOTS = True
 
     def tearDown(self) -> None:
         self._clean_env()

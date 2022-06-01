@@ -2,6 +2,8 @@ import os
 import shutil
 import unittest
 
+import algo_ops.plot.settings as plot_settings
+
 from ocr_ops.framework.op.abstract_ocr_op import OCRResult
 from ocr_ops.framework.op.ocr_op import (
     EasyOCRTextOp,
@@ -31,7 +33,10 @@ class TestOCROps(unittest.TestCase):
         dir_path = os.path.dirname(os.path.realpath(__file__))
         self.joy_of_data_img = os.path.join(dir_path, "data", "joy_of_data.png")
         self.blank_card_img = os.path.join(dir_path, "data", "blank_card.png")
+
+        # env
         self._clean_env()
+        plot_settings.SUPPRESS_PLOTS = True
 
     def tearDown(self) -> None:
         self._clean_env()

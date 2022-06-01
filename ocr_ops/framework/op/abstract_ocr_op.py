@@ -3,10 +3,11 @@ import tempfile
 from abc import ABC, abstractmethod
 from typing import Union, Tuple, Any, Optional, Dict
 
+import algo_ops.plot.settings as plot_settings
 import cv2
 import numpy as np
-from algo_ops.ops.cv import CVOp
 from algo_ops.ops.op import Op
+from algo_ops.plot.plot import pyplot_image
 from easyocr import easyocr
 from pytesseract import pytesseract, Output
 
@@ -28,7 +29,10 @@ class AbstractOCROp(Op, ABC):
                 + str(self.name)
                 + " has not executed yet."
             )
-        CVOp.pyplot_image(img=self.input_img, title=self.name)
+        if plot_settings.SUPPRESS_PLOTS:
+            print("Plot of " + str(self.name) + " input suppressed.")
+        else:
+            pyplot_image(img=self.input_img, title=self.name)
 
     def save_input(self, out_path: str = ".", basename: Optional[str] = None) -> None:
         """
@@ -166,7 +170,10 @@ class TextBoxOCROp(AbstractOCROp, ABC):
                 + str(self.name)
                 + " has not executed yet."
             )
-        CVOp.pyplot_image(img=self.output.output_img, title=self.name)
+        if plot_settings.SUPPRESS_PLOTS:
+            print("Plot of " + str(self.name) + " output suppressed.")
+        else:
+            pyplot_image(img=self.output.output_img, title=self.name)
 
     def save_output(self, out_path: str = ".", basename: Optional[str] = None) -> None:
         """

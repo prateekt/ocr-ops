@@ -2,6 +2,8 @@ import os
 import shutil
 import unittest
 
+import algo_ops.plot.settings as plot_settings
+
 from ocr_ops.framework.op.ffmpeg_op import FFMPEGOp
 
 
@@ -18,7 +20,10 @@ class TestFFMPEGOp(unittest.TestCase):
         # paths
         dir_path = os.path.dirname(os.path.realpath(__file__))
         self.test_video = os.path.join(dir_path, "data", "test.avi")
+
+        # env
         self._clean_env()
+        plot_settings.SUPPRESS_PLOTS = True
 
     def tearDown(self) -> None:
         self._clean_env()
