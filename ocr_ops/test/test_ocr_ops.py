@@ -138,22 +138,22 @@ class TestOCROps(unittest.TestCase):
         self.assertEqual(pytesseract_op.output, None)
         self.assertEqual(len(easy_ocr_op.execution_times), 0)
         self.assertEqual(len(pytesseract_op.execution_times), 0)
-        for method in [
+        for method in (
             easy_ocr_op.vis_input,
             easy_ocr_op.vis,
             easy_ocr_op.vis_profile,
             easy_ocr_op.save_input,
             easy_ocr_op.save_output,
-        ]:
+        ):
             with self.assertRaises(ValueError):
                 method()
-        for method in [
+        for method in (
             pytesseract_op.vis_input,
             pytesseract_op.vis,
             pytesseract_op.vis_profile,
             pytesseract_op.save_input,
             pytesseract_op.save_output,
-        ]:
+        ):
             with self.assertRaises(ValueError):
                 method()
 

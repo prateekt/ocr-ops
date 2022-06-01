@@ -34,6 +34,7 @@ class TestOCRPipeline(unittest.TestCase):
             "pytesseract_autosave",
             "easyocr_autosave",
             "general_autosave",
+            "test_figs",
         ):
             if os.path.exists(direc):
                 shutil.rmtree(direc)
@@ -190,12 +191,12 @@ class TestOCRPipeline(unittest.TestCase):
         self.assertTrue(isinstance(ocr_pipeline.ocr_op, EasyOCRTextOp))
         self.assertEqual(ocr_pipeline.input, None)
         self.assertEqual(ocr_pipeline.output, None)
-        for method in [
+        for method in (
             ocr_pipeline.vis,
             ocr_pipeline.vis_profile,
             ocr_pipeline.save_input,
             ocr_pipeline.save_output,
-        ]:
+        ):
             with self.assertRaises(ValueError):
                 method()
 
@@ -302,9 +303,22 @@ class TestOCRPipeline(unittest.TestCase):
         """
         Test CVPipeline instances.
         """
+        # run pipeline
         cv_pipeline = pipeline_init()
         output = cv_pipeline.exec(self.joy_of_data_img)
         self.assertTrue(isinstance(output, np.ndarray))
+
+        # attempt vis
+        with self.assertRaises(ValueError):
+            cv_pipeline.vis_input()
+        cv_pipeline.vis()
+        cv_pipeline.vis_profile()
+
+        # attempt save
+        with self.assertRaises(ValueError):
+            cv_pipeline.save_input()
+        cv_pipeline.save_output(out_path="test_figs")
+        self.assertTrue(len(os.listdir("test_figs")), 8)
 
     def test_textpipeline_instances(self) -> None:
         """
