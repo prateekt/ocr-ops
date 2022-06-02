@@ -3,6 +3,7 @@ import shutil
 import unittest
 
 import algo_ops.plot.settings as plot_settings
+from algo_ops.dependency.tester_util import clean_paths
 
 from ocr_ops.framework.op.abstract_ocr_op import OCRResult
 from ocr_ops.framework.op.ocr_op import (
@@ -16,16 +17,16 @@ from ocr_ops.framework.op.ocr_op import (
 class TestOCROps(unittest.TestCase):
     @staticmethod
     def _clean_env():
-        for direc in (
-            "txt_ocr_output",
-            "easy_ocr_profile",
-            "pytesseract_profile",
-            "box_ocr_output",
-            "easy_ocr_autosave",
-            "pytesseract_autosave",
-        ):
-            if os.path.exists(direc):
-                shutil.rmtree(direc)
+        clean_paths(
+            dirs=(
+                "txt_ocr_output",
+                "easy_ocr_profile",
+                "pytesseract_profile",
+                "box_ocr_output",
+                "easy_ocr_autosave",
+                "pytesseract_autosave",
+            )
+        )
 
     def setUp(self) -> None:
 

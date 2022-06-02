@@ -3,18 +3,14 @@ import shutil
 import unittest
 
 import algo_ops.plot.settings as plot_settings
+from algo_ops.dependency.tester_util import clean_paths
 
 from ocr_ops.framework.op.ffmpeg_op import FFMPEGOp
 
 
 class TestFFMPEGOp(unittest.TestCase):
     def _clean_env(self) -> None:
-        if os.path.exists("ffmpeg_op_test"):
-            shutil.rmtree("ffmpeg_op_test")
-        if os.path.exists("ffmpeg_op_test_fps1"):
-            shutil.rmtree("ffmpeg_op_test_fps1")
-        if os.path.exists("ffmpeg_profile"):
-            shutil.rmtree("ffmpeg_profile")
+        clean_paths(dirs=("ffmpeg_op_test", "ffmpeg_op_test_fps1", "ffmpeg_profile"))
 
     def setUp(self) -> None:
         # paths

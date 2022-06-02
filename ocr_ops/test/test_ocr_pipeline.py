@@ -1,11 +1,10 @@
 import os
-import shutil
 import unittest
 from typing import Callable
 
 import algo_ops.plot.settings as plot_settings
 import numpy as np
-from algo_ops.dependency.iter_params import iter_params
+from algo_ops.dependency.tester_util import iter_params, clean_paths
 from shapely.geometry import Polygon
 
 from ocr_ops.framework.op.ocr_op import (
@@ -27,17 +26,18 @@ from ocr_ops.instances.text import basic_text_cleaning_pipeline
 
 
 class TestOCRPipeline(unittest.TestCase):
-    def _clean_env(self) -> None:
-        for direc in (
-            "ocr_out",
-            "algo_ops_profile",
-            "pytesseract_autosave",
-            "easyocr_autosave",
-            "general_autosave",
-            "test_figs",
-        ):
-            if os.path.exists(direc):
-                shutil.rmtree(direc)
+    @staticmethod
+    def _clean_env() -> None:
+        clean_paths(
+            dirs=(
+                "ocr_out",
+                "algo_ops_profile",
+                "pytesseract_autosave",
+                "easyocr_autosave",
+                "general_autosave",
+                "test_figs",
+            )
+        )
 
     def _assert_pass_vis_tests(self, ocr_pipeline: OCRPipeline) -> None:
         # test vis input / output
@@ -290,7 +290,7 @@ class TestOCRPipeline(unittest.TestCase):
         )
         ocr_pipeline.set_text_pipeline_params("_check_vocab", {"vocab_words": {"joy"}})
         output = ocr_pipeline.exec(self.joy_of_data_img)
-        self.assertEqual(output.words, ["joy"])
+        self.assertListEqual(output.words, ["joy"])
 
         # test autosave
         self.assertTrue(
@@ -331,12 +331,12 @@ class TestOCRPipeline(unittest.TestCase):
             "_check_vocab", {"vocab_words": {"joy", "of", "data"}}
         )
         output = text_pipeline.exec("joy of ***%$## data opfu")
-        self.assertEqual(output, ["joy", "of", "data"])
+        self.assertListEqual(output, ["joy", "of", "data"])
         output = text_pipeline.exec(["joy of   \n", "***%$## \n" "data\n opfu\n\n\n\n"])
-        self.assertEqual(output, ["joy", "of", "data"])
+        self.assertListEqual(output, ["joy", "of", "data"])
         text_pipeline.set_pipeline_params("_check_vocab", {"vocab_words": {"data"}})
         output = text_pipeline.exec(["joy of   \n", "***%$## \n" "data\n opfu\n\n\n\n"])
-        self.assertEqual(output, ["data"])
+        self.assertListEqual(output, ["data"])
 
     def test_ocr_pipeline_instances(self) -> None:
         """
@@ -351,7 +351,7 @@ class TestOCRPipeline(unittest.TestCase):
         # basic pipeline with text cleaning
         p2 = basic_ocr_with_text_cleaning_pipeline(vocab_words={"joy", "of"})
         output = p2.exec(inp=self.joy_of_data_img)
-        self.assertEqual(output.words, ["joy", "of"])
+        self.assertListEqual(output.words, ["joy", "of"])
 
         # black text ocr
         p3 = black_text_ocr_pipeline()
@@ -365,4 +365,4 @@ class TestOCRPipeline(unittest.TestCase):
         p4 = white_text_ocr_pipeline()
         p4.set_text_pipeline_params("_check_vocab", {"vocab_words": {"data"}})
         output = p4.exec(inp=self.joy_of_data_img)
-        self.assertEqual(output.words, ["data"])
+        self.assertListEqual(output.words, ["data"])

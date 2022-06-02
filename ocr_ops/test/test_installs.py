@@ -4,6 +4,7 @@ import unittest
 
 import easyocr
 import pytesseract
+from algo_ops.dependency.tester_util import clean_paths
 
 from ocr_ops.dependency.ffmpeg import FFMPEG
 
@@ -26,11 +27,11 @@ class TestOCRDependencies(unittest.TestCase):
 
         # test joy of data image
         output = easy_ocr_reader.readtext(self.test_image1, detail=0)
-        self.assertEqual(output, ["joy", "of", "data"])
+        self.assertListEqual(output, ["joy", "of", "data"])
 
         # test blank card image
         output = easy_ocr_reader.readtext(self.test_image2, detail=0)
-        self.assertEqual(output, [])
+        self.assertListEqual(output, [])
 
     def test_pytesseract(self) -> None:
         """
@@ -58,4 +59,4 @@ class TestOCRDependencies(unittest.TestCase):
             video_path=self.test_video, out_path="test_ffmpeg"
         )
         self.assertEqual(len(os.listdir("test_ffmpeg")), 30)
-        shutil.rmtree("test_ffmpeg")
+        clean_paths(dirs=("test_ffmpeg",))
