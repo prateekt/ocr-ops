@@ -1,8 +1,9 @@
 import os
 import unittest
 
-from algo_ops.dependency.tester_util import clean_paths
 import ezplotly.settings as plot_settings
+from algo_ops.dependency.tester_util import clean_paths
+
 from ocr_ops.framework.op.abstract_ocr_op import OCRResult
 from ocr_ops.framework.op.ocr_op import (
     EasyOCRTextOp,

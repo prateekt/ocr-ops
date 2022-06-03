@@ -3,8 +3,8 @@ import tempfile
 from abc import ABC, abstractmethod
 from typing import Union, Tuple, Any, Optional, Dict
 
-import ezplotly.settings as plot_settings
 import cv2
+import ezplotly.settings as plot_settings
 import numpy as np
 from algo_ops.ops.op import Op
 from algo_ops.plot.plot import pyplot_image
