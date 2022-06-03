@@ -1,8 +1,7 @@
 import os
-import shutil
 import unittest
 
-import algo_ops.plot.settings as plot_settings
+import ezplotly.settings as plot_settings
 from algo_ops.dependency.tester_util import clean_paths
 
 from ocr_ops.framework.op.ffmpeg_op import FFMPEGOp

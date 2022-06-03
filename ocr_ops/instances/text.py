@@ -1,5 +1,6 @@
 import functools
 import re
+from collections import OrderedDict
 from typing import List, Set, Union, Callable
 
 from algo_ops.ops.text import TextOp
@@ -89,9 +90,9 @@ class OCRResultUpdater:
     """
 
     @classmethod
-    def _updater(cls, function):
+    def _updater(cls, function: Callable):
         @functools.wraps(function)
-        def wrap(ocr_result: Union[OCRResult, List[str], str], *args, **kwargs):
+        def new_func(ocr_result: Union[OCRResult, List[str], str], *args, **kwargs):
             if isinstance(ocr_result, OCRResult):
                 for text_box in ocr_result.text_boxes:
                     text_box.words = function(text_box.words, *args, **kwargs)
@@ -104,7 +105,7 @@ class OCRResultUpdater:
                 raise ValueError("Unknown type of OCRResult: " + str(type(ocr_result)))
             return ocr_result
 
-        return wrap
+        return new_func
 
     @classmethod
     def prepare_updater(cls, base_func: Callable) -> Callable:
@@ -123,11 +124,26 @@ def basic_text_cleaning_pipeline() -> Pipeline:
     """
     Sets up a basic data cleaning text pipeline preset.
     """
+
+    # base pipeline function order
+    base_funcs = [_retokenize_text, _strip, _check_vocab]
+
+    # create pipeline with wrapped functions
     pipeline = Pipeline.init_from_funcs(
-        [
+        funcs=[
             OCRResultUpdater.prepare_updater(base_func=base_func)
-            for base_func in [_retokenize_text, _strip, _check_vocab]
+            for base_func in base_funcs
         ],
         op_class=TextOp,
     )
+
+    # fix naming
+    new_ops = OrderedDict()
+    for i, key in enumerate(pipeline.ops.keys()):
+        original_name = base_funcs[i].__name__
+        new_key = key.replace("new_func", original_name)
+        new_ops[new_key] = pipeline.ops[key]
+        new_ops[new_key].name = original_name
+    pipeline.ops = new_ops
+
     return pipeline

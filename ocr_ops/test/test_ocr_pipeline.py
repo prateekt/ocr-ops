@@ -2,7 +2,7 @@ import os
 import unittest
 from typing import Callable
 
-import algo_ops.plot.settings as plot_settings
+import ezplotly.settings as plot_settings
 import numpy as np
 from algo_ops.dependency.tester_util import iter_params, clean_paths
 from shapely.geometry import Polygon
@@ -36,7 +36,8 @@ class TestOCRPipeline(unittest.TestCase):
                 "easyocr_autosave",
                 "general_autosave",
                 "test_figs",
-            )
+            ),
+            files=("test.pkl",),
         )
 
     def _assert_pass_vis_tests(self, ocr_pipeline: OCRPipeline) -> None:
@@ -125,6 +126,9 @@ class TestOCRPipeline(unittest.TestCase):
             os.path.exists(os.path.join("pytesseract_autosave", "joy_of_data.txt"))
         )
 
+        # test pickle pipeline
+        ocr_pipeline.to_pickle(out_pkl_path="test.pkl")
+
     def test_ocr_pytesseract_textbox_pipeline(self) -> None:
         """
         Test PyTesseract OCR TextBox pipeline.
@@ -175,6 +179,9 @@ class TestOCRPipeline(unittest.TestCase):
             os.path.exists(os.path.join("pytesseract_autosave", "joy_of_data.png"))
         )
 
+        # test pickle
+        ocr_pipeline.to_pickle(out_pkl_path="test.pkl")
+
     def test_easyocr_text_pipeline(self) -> None:
         """
         Test EasyOCR text-only pipeline.
@@ -222,6 +229,9 @@ class TestOCRPipeline(unittest.TestCase):
         self.assertTrue(
             os.path.exists(os.path.join("easyocr_autosave", "joy_of_data.txt"))
         )
+
+        # test pickle
+        ocr_pipeline.to_pickle(out_pkl_path="test.pkl")
 
     def test_easyocr_textbox_pipeline(self) -> None:
         """
@@ -271,6 +281,9 @@ class TestOCRPipeline(unittest.TestCase):
             os.path.exists(os.path.join("easyocr_autosave", "joy_of_data.png"))
         )
 
+        # test pickle
+        ocr_pipeline.to_pickle(out_pkl_path="test.pkl")
+
     @iter_params(
         ocr_method=(OCRMethod.EASYOCR, OCRMethod.PYTESSERACT),
         output_type=(OutputType.TEXT, OutputType.TEXTBOX),
@@ -298,6 +311,9 @@ class TestOCRPipeline(unittest.TestCase):
             or os.path.exists(os.path.join("general_autosave", "joy_of_data.png"))
         )
 
+        # test pickle
+        ocr_pipeline.to_pickle(out_pkl_path="test.pkl")
+
     @iter_params(pipeline_init=(black_text_cv_pipeline, white_text_cv_pipeline))
     def test_cvpipeline_instances(self, pipeline_init: Callable) -> None:
         """
@@ -320,13 +336,17 @@ class TestOCRPipeline(unittest.TestCase):
         cv_pipeline.save_output(out_path="test_figs")
         self.assertTrue(len(os.listdir("test_figs")), 8)
 
-    def test_textpipeline_instances(self) -> None:
+        # test pickle
+        cv_pipeline.to_pickle(out_pkl_path="test.pkl")
+
+    @iter_params(pipeline_init=(basic_text_cleaning_pipeline,))
+    def test_textpipeline_instances(self, pipeline_init: Callable) -> None:
         """
         Test text cleaning pipeline instances.
         """
 
         # basic cleaning pipeline
-        text_pipeline = basic_text_cleaning_pipeline()
+        text_pipeline = pipeline_init()
         text_pipeline.set_pipeline_params(
             "_check_vocab", {"vocab_words": {"joy", "of", "data"}}
         )
@@ -337,6 +357,9 @@ class TestOCRPipeline(unittest.TestCase):
         text_pipeline.set_pipeline_params("_check_vocab", {"vocab_words": {"data"}})
         output = text_pipeline.exec(["joy of   \n", "***%$## \n" "data\n opfu\n\n\n\n"])
         self.assertListEqual(output, ["data"])
+
+        # test pickle
+        text_pipeline.to_pickle(out_pkl_path="test.pkl")
 
     def test_ocr_pipeline_instances(self) -> None:
         """

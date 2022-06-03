@@ -3,7 +3,7 @@ import tempfile
 from abc import ABC, abstractmethod
 from typing import Union, Tuple, Any, Optional, Dict
 
-import algo_ops.plot.settings as plot_settings
+import ezplotly.settings as plot_settings
 import cv2
 import numpy as np
 from algo_ops.ops.op import Op
@@ -271,3 +271,15 @@ class EasyOCROp(AbstractOCROp, ABC):
             cv2.imwrite(png.name, img)
             result = self.easy_ocr_reader.readtext(png.name, detail=detail)
         return result
+
+    def to_pickle(self, out_pkl_path: str) -> None:
+
+        # temporarily remove un-pickleable elements
+        easy_ocr_instance = self.easy_ocr_reader
+        self.easy_ocr_reader = None
+
+        # super call to pickle
+        super().to_pickle(out_pkl_path=out_pkl_path)
+
+        # restore state
+        self.easy_ocr_reader = easy_ocr_instance

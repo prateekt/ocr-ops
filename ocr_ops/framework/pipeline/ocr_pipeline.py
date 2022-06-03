@@ -8,7 +8,7 @@ from algo_ops.paraloop import paraloop
 from algo_ops.pipeline.cv_pipeline import CVPipeline
 from algo_ops.pipeline.pipeline import Pipeline
 
-from ocr_ops.framework.op.abstract_ocr_op import AbstractOCROp
+from ocr_ops.framework.op.abstract_ocr_op import AbstractOCROp, EasyOCROp
 from ocr_ops.framework.op.ocr_op import (
     PyTesseractTextOCROp,
     PyTesseractTextBoxOCROp,
@@ -78,14 +78,14 @@ class OCRPipeline(Pipeline):
         param text_pipeline: An optional TextOps pipeline to post-process OCR text
         param autosave_img_path: If specified, the place where OCR output images will be auto-saved.
         """
-        self.img_pipeline = img_pipeline
-        self.autosave_img_path = autosave_img_path
-        self.ocr_op = self.__setup_ocr_op(
+        self.img_pipeline: Optional[CVPipeline] = img_pipeline
+        self.autosave_img_path: str = autosave_img_path
+        self.ocr_op: AbstractOCROp = self.__setup_ocr_op(
             ocr_method=ocr_method,
             output_type=output_type,
             autosave_img_path=autosave_img_path,
         )
-        self.text_pipeline = text_pipeline
+        self.text_pipeline: Optional[Pipeline] = text_pipeline
         self.parallel_mechanism: str = "sequential"
 
         # prepare ops list
@@ -147,3 +147,18 @@ class OCRPipeline(Pipeline):
             return results[0]
         else:
             return results
+
+    def to_pickle(self, out_pkl_path: str) -> None:
+
+        # temporarily remove un-pickleable elements
+        easy_ocr_instance = None
+        if isinstance(self.ocr_op, EasyOCROp):
+            easy_ocr_instance = self.ocr_op.easy_ocr_reader
+            self.ocr_op.easy_ocr_reader = None
+
+        # super call to pickle
+        super().to_pickle(out_pkl_path=out_pkl_path)
+
+        # restore state
+        if isinstance(self.ocr_op, EasyOCROp):
+            self.ocr_op.easy_ocr_reader = easy_ocr_instance
