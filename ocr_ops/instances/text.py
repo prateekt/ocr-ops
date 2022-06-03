@@ -104,7 +104,6 @@ class OCRResultUpdater:
             else:
                 raise ValueError("Unknown type of OCRResult: " + str(type(ocr_result)))
             return ocr_result
-
         return new_func
 
     @classmethod
@@ -120,6 +119,26 @@ class OCRResultUpdater:
         return cls._updater(base_func)
 
 
+def _embedded_updater(function: Callable, ocr_result: Union[OCRResult, List[str], str], *args, **kwargs) -> OCRResult:
+    if isinstance(ocr_result, OCRResult):
+        for text_box in ocr_result.text_boxes:
+            text_box.words = function(text_box.words, *args, **kwargs)
+        ocr_result.update_words()
+    elif isinstance(ocr_result, list):
+        ocr_result = function(ocr_result, *args, **kwargs)
+    elif isinstance(ocr_result, str):
+        ocr_result = function([ocr_result], *args, **kwargs)
+    else:
+        raise ValueError("Unknown type of OCRResult: " + str(type(ocr_result)))
+    return ocr_result
+
+
+def prepare_embedded_updater(function: Callable) -> Callable:
+    rtn_func = functools.partial(_embedded_updater, function)
+    rtn_func.__name__ = function.__name__
+    return rtn_func
+
+
 def basic_text_cleaning_pipeline() -> Pipeline:
     """
     Sets up a basic data cleaning text pipeline preset.
@@ -129,6 +148,7 @@ def basic_text_cleaning_pipeline() -> Pipeline:
     base_funcs = [_retokenize_text, _strip, _check_vocab]
 
     # create pipeline with wrapped functions
+    """
     pipeline = Pipeline.init_from_funcs(
         funcs=[
             OCRResultUpdater.prepare_updater(base_func=base_func)
@@ -136,14 +156,11 @@ def basic_text_cleaning_pipeline() -> Pipeline:
         ],
         op_class=TextOp,
     )
-
-    # fix naming
-    new_ops = OrderedDict()
-    for i, key in enumerate(pipeline.ops.keys()):
-        original_name = base_funcs[i].__name__
-        new_key = key.replace("new_func", original_name)
-        new_ops[new_key] = pipeline.ops[key]
-        new_ops[new_key].name = original_name
-    pipeline.ops = new_ops
-
+    """
+    pipeline = Pipeline.init_from_funcs(
+        funcs=[
+            prepare_embedded_updater(function=function) for function in base_funcs
+        ],
+        op_class=TextOp
+    )
     return pipeline
