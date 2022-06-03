@@ -104,6 +104,7 @@ class OCRResultUpdater:
             else:
                 raise ValueError("Unknown type of OCRResult: " + str(type(ocr_result)))
             return ocr_result
+
         return new_func
 
     @classmethod
@@ -119,7 +120,9 @@ class OCRResultUpdater:
         return cls._updater(base_func)
 
 
-def _embedded_updater(function: Callable, ocr_result: Union[OCRResult, List[str], str], *args, **kwargs) -> OCRResult:
+def _embedded_updater(
+    function: Callable, ocr_result: Union[OCRResult, List[str], str], *args, **kwargs
+) -> OCRResult:
     if isinstance(ocr_result, OCRResult):
         for text_box in ocr_result.text_boxes:
             text_box.words = function(text_box.words, *args, **kwargs)
@@ -158,9 +161,7 @@ def basic_text_cleaning_pipeline() -> Pipeline:
     )
     """
     pipeline = Pipeline.init_from_funcs(
-        funcs=[
-            prepare_embedded_updater(function=function) for function in base_funcs
-        ],
-        op_class=TextOp
+        funcs=[prepare_embedded_updater(function=function) for function in base_funcs],
+        op_class=TextOp,
     )
     return pipeline

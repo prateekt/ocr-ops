@@ -370,13 +370,13 @@ class TestOCRPipeline(unittest.TestCase):
         p1 = basic_ocr_pipeline()
         output = p1.exec(inp=self.joy_of_data_img)
         self.assertEqual(output[0].text.strip(), "joy of data")
-        p1.to_pickle('test.pkl')
+        p1.to_pickle("test.pkl")
 
         # basic pipeline with text cleaning
         p2 = basic_ocr_with_text_cleaning_pipeline(vocab_words={"joy", "of"})
         output = p2.exec(inp=self.joy_of_data_img)
         self.assertListEqual(output.words, ["joy", "of"])
-        p2.to_pickle('test.pkl')
+        p2.to_pickle("test.pkl")
 
         # black text ocr
         p3 = black_text_ocr_pipeline()
@@ -385,11 +385,11 @@ class TestOCRPipeline(unittest.TestCase):
         )
         output = p3.exec(inp=self.joy_of_data_img)
         self.assertEqual(output.words, [])
-        p3.to_pickle('test.pkl')
+        p3.to_pickle("test.pkl")
 
         # white text ocr
         p4 = white_text_ocr_pipeline()
         p4.set_text_pipeline_params("_check_vocab", {"vocab_words": {"data"}})
         output = p4.exec(inp=self.joy_of_data_img)
         self.assertListEqual(output.words, ["data"])
-        p4.to_pickle('test.pkl')
+        p4.to_pickle("test.pkl")

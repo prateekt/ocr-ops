@@ -273,7 +273,6 @@ class EasyOCROp(AbstractOCROp, ABC):
         return result
 
     def to_pickle(self, out_pkl_path: str) -> None:
-
         # temporarily remove un-pickleable elements
         easy_ocr_instance = self.easy_ocr_reader
         self.easy_ocr_reader = None
