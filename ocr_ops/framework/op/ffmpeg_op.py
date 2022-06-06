@@ -7,7 +7,7 @@ from ocr_ops.dependency.ffmpeg import FFMPEG
 
 class FFMPEGOp(Op):
     """
-    FFMPEGOP is used to convert a video into image frames stored in a directory. It turns the use of FFMPEG video ->
+    FFMPEGOp is used to convert a video into image frames stored in a directory. It turns the use of FFMPEG video ->
     frames conversion into an Op that can placed into an OCR pipeline.
     """
 
@@ -29,8 +29,8 @@ class FFMPEGOp(Op):
 
     def __init__(self, out_path: Optional[str] = None, fps: int = 10):
         """
-        :param out_path: Path to output directory where images should be extracted
-        :param fps: Frame per second
+        param out_path: Path to output directory where images should be extracted
+        param fps: Frame per second
         """
         self.out_path: str = out_path
         self.fps: int = fps

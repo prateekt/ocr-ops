@@ -5,6 +5,9 @@ from typing import Callable
 import ezplotly.settings as plot_settings
 import numpy as np
 from algo_ops.dependency.tester_util import iter_params, clean_paths
+from algo_ops.ops.cv import ImageResult
+from algo_ops.pipeline.cv_pipeline import CVPipeline
+from algo_ops.pipeline.pipeline import Pipeline
 from shapely.geometry import Polygon
 
 from ocr_ops.framework.op.ocr_op import (
@@ -36,6 +39,10 @@ class TestOCRPipeline(unittest.TestCase):
                 "easyocr_autosave",
                 "general_autosave",
                 "test_figs",
+                "test_autosave1",
+                "test_autosave2",
+                "test_autosave3",
+                "test_autosave4",
             ),
             files=("test.pkl",),
         )
@@ -48,7 +55,7 @@ class TestOCRPipeline(unittest.TestCase):
 
         # test vis profile
         ocr_pipeline.vis_profile()
-        for file in ["['exec_ocr']", "['exec_ocr']_violin", "exec_ocr"]:
+        for file in ["['run_ocr']", "['run_ocr']_violin", "run_ocr"]:
             self.assertTrue(
                 os.path.exists(os.path.join("algo_ops_profile", file + ".png"))
             )
@@ -90,7 +97,7 @@ class TestOCRPipeline(unittest.TestCase):
             ocr_method=OCRMethod.PYTESSERACT,
             output_type=OutputType.TEXT,
             text_pipeline=None,
-            autosave_img_path="pytesseract_autosave",
+            autosave_output_img_path="pytesseract_autosave",
         )
         self.assertTrue(isinstance(ocr_pipeline.ocr_op, PyTesseractTextOCROp))
         self.assertEqual(ocr_pipeline.input, None)
@@ -105,10 +112,10 @@ class TestOCRPipeline(unittest.TestCase):
                 method()
 
         # test execution on sample image
-        output = ocr_pipeline.exec(self.joy_of_data_img)
+        output = ocr_pipeline.exec(self.joy_of_data_img)[0]
         self.assertTrue(isinstance(output, OCRResult))
         self.assertFalse(output.use_bounding_box)
-        self.assertTrue(np.array_equal(output.input_img, output.output_img))
+        self.assertTrue(np.array_equal(output.input_img.img, output.output_img))
         self.assertEqual(len(output), 1)
         self.assertTrue(isinstance(output[0], TextBox))
         self.assertEqual(output[0].text, "joy of data\n")
@@ -140,7 +147,7 @@ class TestOCRPipeline(unittest.TestCase):
             ocr_method=OCRMethod.PYTESSERACT,
             output_type=OutputType.TEXTBOX,
             text_pipeline=None,
-            autosave_img_path="pytesseract_autosave",
+            autosave_output_img_path="pytesseract_autosave",
         )
         self.assertTrue(isinstance(ocr_pipeline.ocr_op, PyTesseractTextBoxOCROp))
         self.assertEqual(ocr_pipeline.input, None)
@@ -155,10 +162,10 @@ class TestOCRPipeline(unittest.TestCase):
                 method()
 
         # test execution on sample image
-        output = ocr_pipeline.exec(self.joy_of_data_img)
+        output = ocr_pipeline.exec(self.joy_of_data_img)[0]
         self.assertTrue(isinstance(output, OCRResult))
         self.assertTrue(output.use_bounding_box)
-        self.assertFalse(np.array_equal(output.input_img, output.output_img))
+        self.assertFalse(np.array_equal(output.input_img.img, output.output_img))
         self.assertEqual(len(output), 7)
         output = [a for a in output if a.conf != -1.0]
         self.assertEqual(len(output), 3)
@@ -193,7 +200,7 @@ class TestOCRPipeline(unittest.TestCase):
             ocr_method=OCRMethod.EASYOCR,
             output_type=OutputType.TEXT,
             text_pipeline=None,
-            autosave_img_path="easyocr_autosave",
+            autosave_output_img_path="easyocr_autosave",
         )
         self.assertTrue(isinstance(ocr_pipeline.ocr_op, EasyOCRTextOp))
         self.assertEqual(ocr_pipeline.input, None)
@@ -209,9 +216,12 @@ class TestOCRPipeline(unittest.TestCase):
 
         # test execution on sample image
         output = ocr_pipeline.exec(self.joy_of_data_img)
-        self.assertTrue(isinstance(output, OCRResult))
+        self.assertTrue(isinstance(output, list))
+        self.assertEqual(len(output), 1)
+        self.assertTrue(isinstance(output[0], OCRResult))
+        output = output[0]
         self.assertFalse(output.use_bounding_box)
-        self.assertTrue(np.array_equal(output.input_img, output.output_img))
+        self.assertTrue(np.array_equal(output.input_img.img, output.output_img))
         self.assertEqual(len(output), 3)
         for i, word in enumerate(["joy", "of", "data"]):
             self.assertTrue(isinstance(output[i], TextBox))
@@ -244,7 +254,7 @@ class TestOCRPipeline(unittest.TestCase):
             ocr_method=OCRMethod.EASYOCR,
             output_type=OutputType.TEXTBOX,
             text_pipeline=None,
-            autosave_img_path="easyocr_autosave",
+            autosave_output_img_path="easyocr_autosave",
         )
         self.assertTrue(isinstance(ocr_pipeline.ocr_op, EasyOCRTextBoxOp))
         self.assertEqual(ocr_pipeline.input, None)
@@ -259,10 +269,10 @@ class TestOCRPipeline(unittest.TestCase):
                 method()
 
         # test execution on sample image
-        output = ocr_pipeline.exec(self.joy_of_data_img)
+        output = ocr_pipeline.exec(self.joy_of_data_img)[0]
         self.assertTrue(isinstance(output, OCRResult))
         self.assertTrue(output.use_bounding_box)
-        self.assertFalse(np.array_equal(output.input_img, output.output_img))
+        self.assertFalse(np.array_equal(output.input_img.img, output.output_img))
         self.assertEqual(len(output), 3)
         for i, word in enumerate(["joy", "of", "data"]):
             self.assertTrue(isinstance(output[i], TextBox))
@@ -299,10 +309,10 @@ class TestOCRPipeline(unittest.TestCase):
             ocr_method=ocr_method,
             output_type=output_type,
             text_pipeline=basic_text_cleaning_pipeline(),
-            autosave_img_path="general_autosave",
+            autosave_output_img_path="general_autosave",
         )
         ocr_pipeline.set_text_pipeline_params("_check_vocab", {"vocab_words": {"joy"}})
-        output = ocr_pipeline.exec(self.joy_of_data_img)
+        output = ocr_pipeline.exec(self.joy_of_data_img)[0]
         self.assertListEqual(output.words, ["joy"])
 
         # test autosave
@@ -320,9 +330,12 @@ class TestOCRPipeline(unittest.TestCase):
         Test CVPipeline instances.
         """
         # run pipeline
-        cv_pipeline = pipeline_init()
+        cv_pipeline: CVPipeline = pipeline_init()
+        assert isinstance(cv_pipeline, CVPipeline)
         output = cv_pipeline.exec(self.joy_of_data_img)
-        self.assertTrue(isinstance(output, np.ndarray))
+        self.assertTrue(isinstance(cv_pipeline.input, ImageResult))
+        self.assertTrue(isinstance(output, ImageResult))
+        self.assertEqual(output, cv_pipeline.output)
 
         # attempt vis
         with self.assertRaises(ValueError):
@@ -346,7 +359,8 @@ class TestOCRPipeline(unittest.TestCase):
         """
 
         # basic cleaning pipeline
-        text_pipeline = pipeline_init()
+        text_pipeline: Pipeline = pipeline_init()
+        self.assertTrue(isinstance(text_pipeline, Pipeline))
         text_pipeline.set_pipeline_params(
             "_check_vocab", {"vocab_words": {"joy", "of", "data"}}
         )
@@ -367,29 +381,34 @@ class TestOCRPipeline(unittest.TestCase):
         """
 
         # basic pipeline
-        p1 = basic_ocr_pipeline()
-        output = p1.exec(inp=self.joy_of_data_img)
-        self.assertEqual(output[0].text.strip(), "joy of data")
+        p1 = basic_ocr_pipeline(autosave_output_img_path="test_autosave1")
+        output = p1.exec(inp=self.joy_of_data_img)[0]
+        self.assertEqual(output.words[0].strip(), "joy of data")
         p1.to_pickle("test.pkl")
 
         # basic pipeline with text cleaning
-        p2 = basic_ocr_with_text_cleaning_pipeline(vocab_words={"joy", "of"})
-        output = p2.exec(inp=self.joy_of_data_img)
+        p2 = basic_ocr_with_text_cleaning_pipeline(
+            vocab_words={"joy", "of"}, autosave_output_img_path="test_autosave2"
+        )
+        output = p2.exec(inp=self.joy_of_data_img)[0]
         self.assertListEqual(output.words, ["joy", "of"])
+        self.assertTrue(
+            os.path.exists(os.path.join("test_autosave2", "joy_of_data.png"))
+        )
         p2.to_pickle("test.pkl")
 
         # black text ocr
-        p3 = black_text_ocr_pipeline()
+        p3 = black_text_ocr_pipeline(autosave_output_img_path="test_autosave3")
         p3.set_text_pipeline_params(
             "_check_vocab", {"vocab_words": {"joy", "data", "of"}}
         )
-        output = p3.exec(inp=self.joy_of_data_img)
+        output = p3.exec(inp=self.joy_of_data_img)[0]
         self.assertEqual(output.words, [])
         p3.to_pickle("test.pkl")
 
         # white text ocr
-        p4 = white_text_ocr_pipeline()
+        p4 = white_text_ocr_pipeline(autosave_output_img_path="test_autosave4")
         p4.set_text_pipeline_params("_check_vocab", {"vocab_words": {"data"}})
-        output = p4.exec(inp=self.joy_of_data_img)
+        output = p4.exec(inp=self.joy_of_data_img)[0]
         self.assertListEqual(output.words, ["data"])
         p4.to_pickle("test.pkl")
