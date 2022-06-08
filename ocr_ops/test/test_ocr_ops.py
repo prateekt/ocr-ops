@@ -3,6 +3,7 @@ import unittest
 
 import ezplotly.settings as plot_settings
 from algo_ops.dependency.tester_util import clean_paths
+from algo_ops.ops.cv import ImageResult
 
 from ocr_ops.framework.op.abstract_ocr_op import OCRResult
 from ocr_ops.framework.op.ocr_op import (
@@ -47,8 +48,10 @@ class TestOCROps(unittest.TestCase):
         """
 
         # init
-        easy_ocr_op = EasyOCRTextOp(autosave_img_path="easy_ocr_autosave")
-        pytesseract_op = PyTesseractTextOCROp(autosave_img_path="pytesseract_autosave")
+        easy_ocr_op = EasyOCRTextOp(autosave_output_img_path="easy_ocr_autosave")
+        pytesseract_op = PyTesseractTextOCROp(
+            autosave_output_img_path="pytesseract_autosave"
+        )
 
         # test that ops without inputs don't do much
         self.assertEqual(easy_ocr_op.input, None)
@@ -74,6 +77,7 @@ class TestOCROps(unittest.TestCase):
 
         # test easy ocr on input images
         output = easy_ocr_op.exec(self.joy_of_data_img)
+        self.assertTrue(isinstance(easy_ocr_op.input, ImageResult))
         self.assertTrue(isinstance(output, OCRResult))
         self.assertEqual(output.to_text_list(), ["joy", "of", "data"])
         output = easy_ocr_op.exec(self.blank_card_img)
@@ -82,6 +86,7 @@ class TestOCROps(unittest.TestCase):
 
         # test pytesseract on test images
         output = pytesseract_op.exec(self.joy_of_data_img)
+        self.assertTrue(isinstance(easy_ocr_op.input, ImageResult))
         self.assertTrue(isinstance(output, OCRResult))
         self.assertEqual(output.to_text_list(), ["joy of data\n"])
         output = pytesseract_op.exec(self.blank_card_img)
@@ -113,11 +118,9 @@ class TestOCROps(unittest.TestCase):
         # test visualizing profile
         easy_ocr_op.vis_profile(profiling_figs_path="easy_ocr_profile")
         pytesseract_op.vis_profile(profiling_figs_path="pytesseract_profile")
+        self.assertTrue(os.path.exists(os.path.join("easy_ocr_profile", "run_ocr.png")))
         self.assertTrue(
-            os.path.exists(os.path.join("easy_ocr_profile", "exec_ocr.png"))
-        )
-        self.assertTrue(
-            os.path.exists(os.path.join("pytesseract_profile", "exec_ocr.png"))
+            os.path.exists(os.path.join("pytesseract_profile", "run_ocr.png"))
         )
 
     def test_textbox_ocr_op(self) -> None:
@@ -126,9 +129,9 @@ class TestOCROps(unittest.TestCase):
         """
 
         # init
-        easy_ocr_op = EasyOCRTextBoxOp(autosave_img_path="easy_ocr_autosave")
+        easy_ocr_op = EasyOCRTextBoxOp(autosave_output_img_path="easy_ocr_autosave")
         pytesseract_op = PyTesseractTextBoxOCROp(
-            autosave_img_path="pytesseract_autosave"
+            autosave_output_img_path="pytesseract_autosave"
         )
 
         # test that ops without inputs don't do much
@@ -166,6 +169,8 @@ class TestOCROps(unittest.TestCase):
             for output in output2
             if output.conf != -1.0 and len(output.text.strip()) > 0
         ]
+        self.assertTrue(isinstance(easy_ocr_op.input, ImageResult))
+        self.assertTrue(isinstance(pytesseract_op.input, ImageResult))
         self.assertEqual(len(output1), 3)
         self.assertEqual(len(output1), len(output2))
         self.assertTrue(all(a.text == b.text for (a, b) in zip(output1, output2)))
@@ -213,11 +218,9 @@ class TestOCROps(unittest.TestCase):
         # test visualizing profile
         easy_ocr_op.vis_profile(profiling_figs_path="easy_ocr_profile")
         pytesseract_op.vis_profile(profiling_figs_path="pytesseract_profile")
+        self.assertTrue(os.path.exists(os.path.join("easy_ocr_profile", "run_ocr.png")))
         self.assertTrue(
-            os.path.exists(os.path.join("easy_ocr_profile", "exec_ocr.png"))
-        )
-        self.assertTrue(
-            os.path.exists(os.path.join("pytesseract_profile", "exec_ocr.png"))
+            os.path.exists(os.path.join("pytesseract_profile", "run_ocr.png"))
         )
 
         # test autosave

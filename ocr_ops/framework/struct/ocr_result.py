@@ -2,6 +2,7 @@ from typing import Optional, List
 
 import cv2
 import numpy as np
+from algo_ops.ops.cv import ImageResult
 from shapely.geometry import Polygon
 
 
@@ -78,17 +79,17 @@ class OCRResult:
     """
 
     def __init__(
-        self, text_boxes: List[TextBox], input_img: np.array, use_bounding_box: bool
+        self, text_boxes: List[TextBox], input_img: ImageResult, use_bounding_box: bool
     ):
         """
-        Initialize OCRResult
+        Initialize OCRResult.
 
         param text_boxes: Detected text boxes in image
         param input_img: Pointer to raw input image
         param use_bounding_box: Whether bounding box annotations are used
         """
         self.text_boxes: List[TextBox] = text_boxes
-        self.input_img: np.array = input_img
+        self.input_img: ImageResult = input_img
         self.use_bounding_box = use_bounding_box
         self.output_img: np.array = self._prepare_output_image()
         self.words: List[str] = list()
@@ -104,7 +105,7 @@ class OCRResult:
         return:
             output_image: Output image ready for visualization
         """
-        output_img = self.input_img.copy()
+        output_img = self.input_img.img.copy()
         if self.use_bounding_box:
             for text_box in self.text_boxes:
                 (x0, y0, xf, yf) = [int(a) for a in text_box.bounding_box.bounds]
@@ -112,6 +113,9 @@ class OCRResult:
         return output_img
 
     def update_words(self) -> None:
+        """
+        Updates words with latest information from text boxes.
+        """
         words: List[str] = list()
         for text_box in self.text_boxes:
             words += text_box.words

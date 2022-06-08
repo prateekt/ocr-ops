@@ -6,6 +6,7 @@ from typing import Union, Tuple, Any, Optional, Dict
 import cv2
 import ezplotly.settings as plot_settings
 import numpy as np
+from algo_ops.ops.cv import ImageResult, CVOp
 from algo_ops.ops.op import Op
 from algo_ops.plot.plot import pyplot_image
 from easyocr import easyocr
@@ -19,106 +20,89 @@ class AbstractOCROp(Op, ABC):
     Turns the use of OCR package into an Op.
     """
 
-    def vis_input(self) -> None:
+    def __init__(
+        self,
+        supported_languages: Tuple[str],
+        autosave_output_img_path: Optional[str] = None,
+    ):
         """
-        Visualizes input to OCROp. Raises a ValueError if there is no input.
-        """
-        if self.input_img is None:
-            raise ValueError(
-                "There is no input to be visualized since "
-                + str(self.name)
-                + " has not executed yet."
-            )
-        if plot_settings.SUPPRESS_PLOTS:
-            print("Plot of " + str(self.name) + " input suppressed.")
-        else:
-            pyplot_image(img=self.input_img, title=self.name)
+        Constructor for Abstract OCROp.
 
-    def save_input(self, out_path: str = ".", basename: Optional[str] = None) -> None:
+        param supported_languages: The languages to support in OCR
+        param autosave_output_img_path: If specified, the place where OCR output images will be auto-saved.
         """
-        Saves input to file.
-
-        param out_path: Path to where saved file should go
-        param basename: Basename of saved file
-        """
-        if self.input_img is not None:
-            if out_path.endswith(".png"):
-                outfile = out_path
-            else:
-                os.makedirs(out_path, exist_ok=True)
-                if basename is not None:
-                    outfile = os.path.join(out_path, basename + "_input.png")
-                else:
-                    outfile = os.path.join(out_path, self.name + "_input.png")
-            cv2.imwrite(outfile, self.input_img)
-        else:
-            raise ValueError(
-                "There is not input, and Op "
-                + str(self.name)
-                + " has not executed yet."
-            )
+        super().__init__(func=self.run_ocr)
+        self.supported_languages = supported_languages
+        self.autosave_output_img_path = autosave_output_img_path
+        self.input: Optional[ImageResult] = None
+        self.output: Optional[OCRResult] = None
 
     @abstractmethod
-    def run_ocr(self, img: np.array) -> OCRResult:
+    def run_ocr(self, img: ImageResult) -> OCRResult:
         """
         Runs OCR pipeline on an image.
 
-        param img: Image matrix in numpy
+        param img: Input Image
 
         return:
             ocr_result: OCRResultObject
         """
         pass
 
-    def exec_ocr(self, inp: Union[str, np.array]) -> OCRResult:
+    def exec(self, inp: Union[str, np.array, ImageResult]) -> OCRResult:
         """
-        Executes OCR on an input and returns OCRResult. Flexible wrapper that can take in an image file path or image.
+        Execute OCR operation on input image to produce OCRResult.
 
-        param inp: Either path to image file or numpy image matrix
+        param inp: Either path to image file, numpy image matrix, or ImageResult
 
         return:
-            ocr_result: OCRResult
+            OCR Result
         """
-        if isinstance(inp, str):
-            img = cv2.imread(filename=inp)
-        elif isinstance(inp, np.ndarray):
-            img = inp
+        # parse input into ImageResult object
+        input_img_result = CVOp.parse_input(inp=inp)
+        if input_img_result.file_path is not None:
+            basename: str = os.path.splitext(
+                os.path.basename(input_img_result.file_path)
+            )[0]
         else:
-            raise ValueError("Unsupported input: " + str(inp))
-        self.input_img = img
-        ocr_result = self.run_ocr(img=img)
-        return ocr_result
+            basename: str = str(len(self.execution_times)).zfill(6)
 
-    def __init__(
-        self, supported_languages: Tuple[str], autosave_img_path: Optional[str] = None
-    ):
-        """
-        Constructor for Abstract OCROp.
+        # run function on input image to produce OCR Result
+        output = super().exec(input_img_result)
+        assert isinstance(output, OCRResult)
+        self.input = input_img_result
+        self.output = output
 
-        param supported_languages: The languages to support in OCR
-        param autosave_img_path: If specified, the place where OCR output images will be auto-saved.
-        """
-        self.supported_languages = supported_languages
-        self.autosave_img_path = autosave_img_path
-        self.input_img: Optional[np.array] = None
-        super().__init__(func=self.exec_ocr)
+        # autosave (if necessary)
+        if self.autosave_output_img_path is not None:
+            self.save_output(out_path=self.autosave_output_img_path, basename=basename)
 
-    def exec(self, inp: Union[str, np.array]) -> Any:
-        """
-        Exec supporting autosave of outputs.
+        # return output
+        return self.output
 
-        param inp: Op Input
-        return:
-            Op Output
+    def vis_input(self) -> None:
         """
-        if isinstance(inp, str):
-            basename = os.path.splitext(os.path.basename(inp))[0]
+        Plot current input image using pyplot (jupyter compatible)
+        """
+        if self.input is None:
+            raise ValueError("There is no input to be visualized.")
         else:
-            basename = len(self.execution_times)
-        output = super().exec(inp=inp)
-        if self.autosave_img_path is not None:
-            self.save_output(out_path=self.autosave_img_path, basename=basename)
-        return output
+            self.input.plot(title=self.name)
+
+    def save_input(self, out_path: str = ".", basename: Optional[str] = None) -> None:
+        """
+        Saves current input image to file.
+
+        param out_path: Path to where file should be saved.
+        param basename: Basename of file
+        """
+        if self.input is not None:
+            if basename is None:
+                basename = self.name
+            basename += "_input"
+            self.input.save(out_path=out_path, basename=basename)
+        else:
+            raise ValueError("There is no input to be saved.")
 
 
 class TextOCROp(AbstractOCROp, ABC):
@@ -243,15 +227,16 @@ class EasyOCROp(AbstractOCROp, ABC):
     def __init__(
         self,
         supported_languages: Tuple[str] = ("en",),
-        autosave_img_path: Optional[str] = None,
+        autosave_output_img_path: Optional[str] = None,
     ):
         """
         param supported_languages: The languages to support in OCR
-        param autosave_img_path: If specified, the place where OCR output images will be auto-saved.
+        param autosave_output_img_path: If specified, the place where OCR output images will be auto-saved.
 
         """
         super().__init__(
-            supported_languages=supported_languages, autosave_img_path=autosave_img_path
+            supported_languages=supported_languages,
+            autosave_output_img_path=autosave_output_img_path,
         )
         self.easy_ocr_reader: Optional[easyocr.Reader] = easyocr.Reader(
             lang_list=list(self.supported_languages)
