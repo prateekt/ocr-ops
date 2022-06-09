@@ -15,7 +15,7 @@ from ocr_ops.framework.op.ocr_op import (
     EasyOCRTextBoxOp,
     EasyOCRTextOp,
 )
-from ocr_ops.framework.struct.ocr_result import OCRResult
+from ocr_ops.framework.op.result.ocr_result import OCRResult
 
 
 class OCRMethod(Enum):

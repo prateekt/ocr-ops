@@ -16,8 +16,8 @@ from ocr_ops.framework.op.ocr_op import (
     EasyOCRTextOp,
     EasyOCRTextBoxOp,
 )
+from ocr_ops.framework.op.result.ocr_result import OCRResult, TextBox
 from ocr_ops.framework.pipeline.ocr_pipeline import OCRPipeline, OCRMethod, OutputType
-from ocr_ops.framework.struct.ocr_result import OCRResult, TextBox
 from ocr_ops.instances.cv import black_text_cv_pipeline, white_text_cv_pipeline
 from ocr_ops.instances.ocr import (
     basic_ocr_pipeline,

@@ -5,10 +5,12 @@ import ezplotly.settings as plot_settings
 from algo_ops.dependency.tester_util import clean_paths
 
 from ocr_ops.framework.op.ffmpeg_op import FFMPEGOp
+from ocr_ops.framework.op.result.ffmeg_result import FFMPEGResult
 
 
 class TestFFMPEGOp(unittest.TestCase):
-    def _clean_env(self) -> None:
+    @staticmethod
+    def _clean_env() -> None:
         clean_paths(dirs=("ffmpeg_op_test", "ffmpeg_op_test_fps1", "ffmpeg_profile"))
 
     def setUp(self) -> None:
@@ -29,10 +31,10 @@ class TestFFMPEGOp(unittest.TestCase):
         """
 
         # init FFMPEG Op
-        op = FFMPEGOp(out_path="ffmpeg_op_test")
+        op = FFMPEGOp(image_out_path="ffmpeg_op_test")
         self.assertEqual(op.input, None)
         self.assertEqual(op.output, None)
-        self.assertEqual(op.out_path, "ffmpeg_op_test")
+        self.assertEqual(op.image_out_path, "ffmpeg_op_test")
         self.assertEqual(op.fps, 10)
         self.assertEqual(op.eval_func, None)
         self.assertEqual(len(op.execution_times), 0)
@@ -43,9 +45,13 @@ class TestFFMPEGOp(unittest.TestCase):
 
         # run video through op (fps=10)
         op.exec(inp=self.test_video)
+        self.assertTrue(isinstance(op.input, str))
+        self.assertTrue(isinstance(op.output, FFMPEGResult))
         self.assertEqual(op.input, self.test_video)
-        self.assertEqual(op.output, "ffmpeg_op_test")
-        self.assertEqual(op.out_path, "ffmpeg_op_test")
+        self.assertEqual(op.output.input_video_path, self.test_video)
+        self.assertEqual(op.output.output_images_path, "ffmpeg_op_test")
+        self.assertEqual(op.output.fps, 10)
+        self.assertEqual(op.image_out_path, "ffmpeg_op_test")
         self.assertEqual(op.fps, 10)
         self.assertEqual(op.eval_func, None)
         self.assertEqual(len(op.execution_times), 1)
@@ -54,11 +60,15 @@ class TestFFMPEGOp(unittest.TestCase):
 
         # run video again at different fps (fps=1) and check state
         op.fps = 1
-        op.out_path = "ffmpeg_op_test_fps1"
+        op.image_out_path = "ffmpeg_op_test_fps1"
         op.exec(inp=self.test_video)
+        self.assertTrue(isinstance(op.input, str))
+        self.assertTrue(isinstance(op.output, FFMPEGResult))
         self.assertEqual(op.input, self.test_video)
-        self.assertEqual(op.output, "ffmpeg_op_test_fps1")
-        self.assertEqual(op.out_path, "ffmpeg_op_test_fps1")
+        self.assertEqual(op.output.input_video_path, self.test_video)
+        self.assertEqual(op.output.output_images_path, "ffmpeg_op_test_fps1")
+        self.assertEqual(op.output.fps, 1)
+        self.assertEqual(op.image_out_path, "ffmpeg_op_test_fps1")
         self.assertEqual(op.fps, 1)
         self.assertEqual(op.eval_func, None)
         self.assertEqual(len(op.execution_times), 2)

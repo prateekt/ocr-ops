@@ -6,12 +6,14 @@ from algo_ops.ops.text import TextOp
 from algo_ops.pipeline.pipeline import Pipeline
 from spellchecker import SpellChecker
 
-from ocr_ops.framework.struct.ocr_result import OCRResult
+from ocr_ops.framework.op.result.ocr_result import OCRResult
 
 
 def _extract_confident_text_from_ocr_result(
     ocr_result: Union[OCRResult, str, List[str]]
 ) -> List[str]:
+
+    # convert to List[str] if already string-only
     if isinstance(ocr_result, str):
         return [ocr_result]
     if isinstance(ocr_result, list):

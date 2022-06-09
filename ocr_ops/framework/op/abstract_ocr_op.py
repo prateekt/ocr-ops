@@ -12,7 +12,7 @@ from algo_ops.plot.plot import pyplot_image
 from easyocr import easyocr
 from pytesseract import pytesseract, Output
 
-from ocr_ops.framework.struct.ocr_result import OCRResult
+from ocr_ops.framework.op.result.ocr_result import OCRResult
 
 
 class AbstractOCROp(Op, ABC):

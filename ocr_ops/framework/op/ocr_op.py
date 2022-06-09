@@ -12,7 +12,7 @@ from ocr_ops.framework.op.abstract_ocr_op import (
     OCRResult,
     EasyOCROp,
 )
-from ocr_ops.framework.struct.ocr_result import TextBox
+from ocr_ops.framework.op.result.ocr_result import TextBox
 
 
 class PyTesseractTextOCROp(PyTesseractOp, TextOCROp):
