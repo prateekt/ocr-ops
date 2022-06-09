@@ -73,17 +73,15 @@ class TextBox:
         return self.overlap_area(other=other) / self.bounding_box.area
 
 
-class OCRResult:
+class OCRImageResult:
     """
-    OCRResult holds the result of an OCR operation.
+    OCRImageResult holds the result of an OCR operation on a single image.
     """
 
     def __init__(
         self, text_boxes: List[TextBox], input_img: ImageResult, use_bounding_box: bool
     ):
         """
-        Initialize OCRResult.
-
         param text_boxes: Detected text boxes in image
         param input_img: Pointer to raw input image
         param use_bounding_box: Whether bounding box annotations are used
@@ -122,18 +120,18 @@ class OCRResult:
         self.words = words
 
     @staticmethod
-    def from_text_list(texts: List[str], input_img: np.array) -> "OCRResult":
+    def from_text_list(texts: List[str], input_img: np.array) -> "OCRImageResult":
         """
-        Creates an OCRResult from a list of detected text strings (no bounding box annotations)
+        Creates an OCRImageResult from a list of detected text strings (no bounding box annotations)
 
         param texts: List of detected text strings
         param input_img: The input image
 
         return:
-            ocr_result: OCRResult object
+            ocr_result: OCRImageResult object
         """
         text_boxes: List[TextBox] = [TextBox(text=text) for text in texts]
-        ocr_result = OCRResult(
+        ocr_result = OCRImageResult(
             text_boxes=text_boxes, input_img=input_img, use_bounding_box=False
         )
         return ocr_result
@@ -155,3 +153,26 @@ class OCRResult:
             Detected text as list of strings
         """
         return [text_box.text for text_box in self.text_boxes]
+
+
+class OCRPipelineResult:
+    """
+    Represents the full result of an OCRPipeline task (on one or multiple image frames or on a video).
+    """
+
+    def __init__(self, ocr_image_results: List[OCRImageResult], input_path: str):
+        """
+        param ocr_image_results: List of OCR Image Results, one for each input image frame
+        param input_path: Path to original input file or directory
+        """
+        self.ocr_image_results: List[OCRImageResult] = ocr_image_results
+        self.input_path: str = input_path
+
+    def __getitem__(self, i) -> OCRImageResult:
+        return self.ocr_image_results[i]
+
+    def __setitem__(self, key, value) -> None:
+        self.ocr_image_results[key] = value
+
+    def __len__(self) -> int:
+        return len(self.ocr_image_results)

@@ -6,11 +6,11 @@ from algo_ops.ops.text import TextOp
 from algo_ops.pipeline.pipeline import Pipeline
 from spellchecker import SpellChecker
 
-from ocr_ops.framework.op.result.ocr_result import OCRResult
+from ocr_ops.framework.op.result.ocr_result import OCRImageResult
 
 
 def _extract_confident_text_from_ocr_result(
-    ocr_result: Union[OCRResult, str, List[str]]
+    ocr_result: Union[OCRImageResult, str, List[str]]
 ) -> List[str]:
 
     # convert to List[str] if already string-only
@@ -87,14 +87,16 @@ def _check_vocab(words: List[str], vocab_words: Set[str]) -> List[str]:
 
 class OCRResultUpdater:
     """
-    Wrapper that allows updating of OCRResult TextBoxes using text processing functions.
+    Wrapper that allows updating of OCRPipelineResult TextBoxes using text processing functions.
     """
 
     @classmethod
     def _updater(cls, function: Callable):
         @functools.wraps(function)
-        def new_func(ocr_result: Union[OCRResult, List[str], str], *args, **kwargs):
-            if isinstance(ocr_result, OCRResult):
+        def new_func(
+            ocr_result: Union[OCRImageResult, List[str], str], *args, **kwargs
+        ):
+            if isinstance(ocr_result, OCRImageResult):
                 for text_box in ocr_result.text_boxes:
                     text_box.words = function(text_box.words, *args, **kwargs)
                 ocr_result.update_words()
@@ -103,7 +105,9 @@ class OCRResultUpdater:
             elif isinstance(ocr_result, str):
                 ocr_result = function([ocr_result], *args, **kwargs)
             else:
-                raise ValueError("Unknown type of OCRResult: " + str(type(ocr_result)))
+                raise ValueError(
+                    "Unknown type of OCRPipelineResult: " + str(type(ocr_result))
+                )
             return ocr_result
 
         return new_func
@@ -111,20 +115,23 @@ class OCRResultUpdater:
     @classmethod
     def prepare_updater(cls, base_func: Callable) -> Callable:
         """
-        Prepares updater function that changes OCRResult based on text-processing function that operates on List[str].
+        Prepares updater function that changes OCRPipelineResult based on text-processing function that operates on List[str].
 
         param base_func: The base text-processing function.
 
         return:
-            OCRResult Updater Function
+            OCRPipelineResult Updater Function
         """
         return cls._updater(base_func)
 
 
 def _embedded_updater(
-    function: Callable, ocr_result: Union[OCRResult, List[str], str], *args, **kwargs
-) -> OCRResult:
-    if isinstance(ocr_result, OCRResult):
+    function: Callable,
+    ocr_result: Union[OCRImageResult, List[str], str],
+    *args,
+    **kwargs
+) -> OCRImageResult:
+    if isinstance(ocr_result, OCRImageResult):
         for text_box in ocr_result.text_boxes:
             text_box.words = function(text_box.words, *args, **kwargs)
         ocr_result.update_words()
@@ -133,7 +140,7 @@ def _embedded_updater(
     elif isinstance(ocr_result, str):
         ocr_result = function([ocr_result], *args, **kwargs)
     else:
-        raise ValueError("Unknown type of OCRResult: " + str(type(ocr_result)))
+        raise ValueError("Unknown type of OCRPipelineResult: " + str(type(ocr_result)))
     return ocr_result
 
 

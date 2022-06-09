@@ -16,7 +16,11 @@ from ocr_ops.framework.op.ocr_op import (
     EasyOCRTextOp,
     EasyOCRTextBoxOp,
 )
-from ocr_ops.framework.op.result.ocr_result import OCRResult, TextBox
+from ocr_ops.framework.op.result.ocr_result import (
+    OCRImageResult,
+    TextBox,
+    OCRPipelineResult,
+)
 from ocr_ops.framework.pipeline.ocr_pipeline import OCRPipeline, OCRMethod, OutputType
 from ocr_ops.instances.cv import black_text_cv_pipeline, white_text_cv_pipeline
 from ocr_ops.instances.ocr import (
@@ -112,8 +116,10 @@ class TestOCRPipeline(unittest.TestCase):
                 method()
 
         # test execution on sample image
-        output = ocr_pipeline.exec(self.joy_of_data_img)[0]
-        self.assertTrue(isinstance(output, OCRResult))
+        output = ocr_pipeline.exec(self.joy_of_data_img)
+        self.assertTrue(isinstance(output, OCRPipelineResult))
+        output = output[0]
+        self.assertTrue(isinstance(output, OCRImageResult))
         self.assertFalse(output.use_bounding_box)
         self.assertTrue(np.array_equal(output.input_img.img, output.output_img))
         self.assertEqual(len(output), 1)
@@ -162,8 +168,10 @@ class TestOCRPipeline(unittest.TestCase):
                 method()
 
         # test execution on sample image
-        output = ocr_pipeline.exec(self.joy_of_data_img)[0]
-        self.assertTrue(isinstance(output, OCRResult))
+        output = ocr_pipeline.exec(self.joy_of_data_img)
+        self.assertTrue(isinstance(output, OCRPipelineResult))
+        output = output[0]
+        self.assertTrue(isinstance(output, OCRImageResult))
         self.assertTrue(output.use_bounding_box)
         self.assertFalse(np.array_equal(output.input_img.img, output.output_img))
         self.assertEqual(len(output), 7)
@@ -216,9 +224,9 @@ class TestOCRPipeline(unittest.TestCase):
 
         # test execution on sample image
         output = ocr_pipeline.exec(self.joy_of_data_img)
-        self.assertTrue(isinstance(output, list))
+        self.assertTrue(isinstance(output, OCRPipelineResult))
         self.assertEqual(len(output), 1)
-        self.assertTrue(isinstance(output[0], OCRResult))
+        self.assertTrue(isinstance(output[0], OCRImageResult))
         output = output[0]
         self.assertFalse(output.use_bounding_box)
         self.assertTrue(np.array_equal(output.input_img.img, output.output_img))
@@ -269,8 +277,10 @@ class TestOCRPipeline(unittest.TestCase):
                 method()
 
         # test execution on sample image
-        output = ocr_pipeline.exec(self.joy_of_data_img)[0]
-        self.assertTrue(isinstance(output, OCRResult))
+        output = ocr_pipeline.exec(self.joy_of_data_img)
+        self.assertTrue(isinstance(output, OCRPipelineResult))
+        output = output[0]
+        self.assertTrue(isinstance(output, OCRImageResult))
         self.assertTrue(output.use_bounding_box)
         self.assertFalse(np.array_equal(output.input_img.img, output.output_img))
         self.assertEqual(len(output), 3)

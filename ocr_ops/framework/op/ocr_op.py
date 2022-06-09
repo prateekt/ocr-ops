@@ -9,7 +9,7 @@ from ocr_ops.framework.op.abstract_ocr_op import (
     PyTesseractOp,
     TextOCROp,
     TextBoxOCROp,
-    OCRResult,
+    OCRImageResult,
     EasyOCROp,
 )
 from ocr_ops.framework.op.result.ocr_result import TextBox
@@ -34,9 +34,9 @@ class PyTesseractTextOCROp(PyTesseractOp, TextOCROp):
             autosave_output_img_path=autosave_output_img_path,
         )
 
-    def run_ocr(self, img: ImageResult) -> OCRResult:
+    def run_ocr(self, img: ImageResult) -> OCRImageResult:
         """
-        Runs OCR and returns OCRResult.
+        Runs OCR and returns OCRPipelineResult.
 
         param img: Input image
 
@@ -44,7 +44,9 @@ class PyTesseractTextOCROp(PyTesseractOp, TextOCROp):
             OCR Result
         """
         ocr_output: List[str] = [self._image_to_string(img=img.img)]
-        output: OCRResult = OCRResult.from_text_list(texts=ocr_output, input_img=img)
+        output: OCRImageResult = OCRImageResult.from_text_list(
+            texts=ocr_output, input_img=img
+        )
         return output
 
 
@@ -66,14 +68,14 @@ class PyTesseractTextBoxOCROp(PyTesseractOp, TextBoxOCROp):
             autosave_output_img_path=autosave_output_img_path,
         )
 
-    def run_ocr(self, img: ImageResult) -> OCRResult:
+    def run_ocr(self, img: ImageResult) -> OCRImageResult:
         """
-        Runs OCR and returns OCRResult.
+        Runs OCR and returns OCRPipelineResult.
 
         param img: Input image
 
         return:
-            OCRResult
+            OCRPipelineResult
         """
         ocr_outputs = pytesseract.image_to_data(img.img, output_type=Output.DICT)
         text_boxes: List[TextBox] = list()
@@ -89,7 +91,9 @@ class PyTesseractTextBoxOCROp(PyTesseractOp, TextBoxOCROp):
             )
             text_box = TextBox(text=text, bounding_box=bounding_box, conf=conf)
             text_boxes.append(text_box)
-        output = OCRResult(text_boxes=text_boxes, input_img=img, use_bounding_box=True)
+        output = OCRImageResult(
+            text_boxes=text_boxes, input_img=img, use_bounding_box=True
+        )
         return output
 
 
@@ -112,17 +116,19 @@ class EasyOCRTextOp(EasyOCROp, TextOCROp):
             autosave_output_img_path=autosave_output_img_path,
         )
 
-    def run_ocr(self, img: ImageResult) -> OCRResult:
+    def run_ocr(self, img: ImageResult) -> OCRImageResult:
         """
-        Runs OCR and returns OCRResult.
+        Runs OCR and returns OCRPipelineResult.
 
         param img: Input image
 
         return:
-            OCRResult
+            OCRPipelineResult
         """
         ocr_outputs = self._run_easy_ocr(img=img.img, detail=0)
-        output: OCRResult = OCRResult.from_text_list(texts=ocr_outputs, input_img=img)
+        output: OCRImageResult = OCRImageResult.from_text_list(
+            texts=ocr_outputs, input_img=img
+        )
         return output
 
 
@@ -145,14 +151,14 @@ class EasyOCRTextBoxOp(EasyOCROp, TextBoxOCROp):
             autosave_output_img_path=autosave_output_img_path,
         )
 
-    def run_ocr(self, img: ImageResult) -> OCRResult:
+    def run_ocr(self, img: ImageResult) -> OCRImageResult:
         """
-        Runs OCR and returns OCRResult.
+        Runs OCR and returns OCRPipelineResult.
 
         param img: Input image
 
         return:
-            OCRResult
+            OCRPipelineResult
         """
         ocr_outputs = self._run_easy_ocr(img=img.img, detail=1)
         text_boxes: List[TextBox] = list()
@@ -166,5 +172,7 @@ class EasyOCRTextBoxOp(EasyOCROp, TextBoxOCROp):
             bounding_box: Polygon = box(minx=minx, miny=miny, maxx=maxx, maxy=maxy)
             text_box = TextBox(text=text, bounding_box=bounding_box, conf=conf)
             text_boxes.append(text_box)
-        output = OCRResult(text_boxes=text_boxes, input_img=img, use_bounding_box=True)
+        output = OCRImageResult(
+            text_boxes=text_boxes, input_img=img, use_bounding_box=True
+        )
         return output

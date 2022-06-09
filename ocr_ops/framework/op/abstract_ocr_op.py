@@ -12,7 +12,7 @@ from algo_ops.plot.plot import pyplot_image
 from easyocr import easyocr
 from pytesseract import pytesseract, Output
 
-from ocr_ops.framework.op.result.ocr_result import OCRResult
+from ocr_ops.framework.op.result.ocr_result import OCRImageResult
 
 
 class AbstractOCROp(Op, ABC):
@@ -35,10 +35,10 @@ class AbstractOCROp(Op, ABC):
         self.supported_languages = supported_languages
         self.autosave_output_img_path = autosave_output_img_path
         self.input: Optional[ImageResult] = None
-        self.output: Optional[OCRResult] = None
+        self.output: Optional[OCRImageResult] = None
 
     @abstractmethod
-    def run_ocr(self, img: ImageResult) -> OCRResult:
+    def run_ocr(self, img: ImageResult) -> OCRImageResult:
         """
         Runs OCR pipeline on an image.
 
@@ -49,9 +49,9 @@ class AbstractOCROp(Op, ABC):
         """
         pass
 
-    def exec(self, inp: Union[str, np.array, ImageResult]) -> OCRResult:
+    def exec(self, inp: Union[str, np.array, ImageResult]) -> OCRImageResult:
         """
-        Execute OCR operation on input image to produce OCRResult.
+        Execute OCR operation on input image to produce OCRPipelineResult.
 
         param inp: Either path to image file, numpy image matrix, or ImageResult
 
@@ -69,7 +69,7 @@ class AbstractOCROp(Op, ABC):
 
         # run function on input image to produce OCR Result
         output = super().exec(input_img_result)
-        assert isinstance(output, OCRResult)
+        assert isinstance(output, OCRImageResult)
         self.input = input_img_result
         self.output = output
 

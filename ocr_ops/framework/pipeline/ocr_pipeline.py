@@ -1,6 +1,6 @@
 import os.path
 from enum import Enum
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Union
 
 from algo_ops.dependency.sys_util import get_image_files, is_image_file
 from algo_ops.ops.op import Op
@@ -15,7 +15,8 @@ from ocr_ops.framework.op.ocr_op import (
     EasyOCRTextBoxOp,
     EasyOCRTextOp,
 )
-from ocr_ops.framework.op.result.ocr_result import OCRResult
+from ocr_ops.framework.op.result.ffmeg_result import FFMPEGResult
+from ocr_ops.framework.op.result.ocr_result import OCRImageResult, OCRPipelineResult
 
 
 class OCRMethod(Enum):
@@ -29,7 +30,7 @@ class OCRMethod(Enum):
 
 class OutputType(Enum):
     """
-    The type of output to obtain from OCR in an OCRResult.
+    The type of output to obtain from OCR in an OCRPipelineResult.
     """
 
     # just raw text
@@ -103,7 +104,7 @@ class OCRPipeline(Pipeline):
         self.text_pipeline: Optional[Pipeline] = text_pipeline
         self.parallel_mechanism: str = "sequential"
         self.input: Optional[str] = None
-        self.output: Optional[List[OCRResult]] = None
+        self.output: Optional[OCRPipelineResult] = None
 
         # prepare ops list
         ops: List[Op] = list()
@@ -165,7 +166,7 @@ class OCRPipeline(Pipeline):
             files = [input_path]
         return files
 
-    def exec(self, inp: str) -> List[OCRResult]:
+    def exec(self, inp: Union[str, FFMPEGResult]) -> OCRPipelineResult:
         """
         API to run OCR on a single image or a directory of images.
 
@@ -174,11 +175,21 @@ class OCRPipeline(Pipeline):
         return:
             output: List of OCR results
         """
-        files = self._parse_image_files_list_from_input(input_path=inp)
-        results = paraloop.loop(
+        # prepare input as List[str] of files
+        if isinstance(inp, FFMPEGResult):
+            images_path = inp.output_images_path
+            original_input_path = inp.input_video_path
+        else:
+            images_path = inp
+            original_input_path = inp
+        files = self._parse_image_files_list_from_input(input_path=images_path)
+        ocr_img_results: List[OCRImageResult] = paraloop.loop(
             func=super().exec, params=files, mechanism=self.parallel_mechanism
         )
-        return results
+        self.input = images_path
+        return OCRPipelineResult(
+            ocr_image_results=ocr_img_results, input_path=original_input_path
+        )
 
     def to_pickle(self, out_pkl_path: str) -> None:
         """

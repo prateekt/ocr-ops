@@ -5,13 +5,13 @@ import ezplotly.settings as plot_settings
 from algo_ops.dependency.tester_util import clean_paths
 from algo_ops.ops.cv import ImageResult
 
-from ocr_ops.framework.op.abstract_ocr_op import OCRResult
 from ocr_ops.framework.op.ocr_op import (
     EasyOCRTextOp,
     PyTesseractTextOCROp,
     EasyOCRTextBoxOp,
     PyTesseractTextBoxOCROp,
 )
+from ocr_ops.framework.op.result.ocr_result import OCRImageResult
 
 
 class TestOCROps(unittest.TestCase):
@@ -78,19 +78,19 @@ class TestOCROps(unittest.TestCase):
         # test easy ocr on input images
         output = easy_ocr_op.exec(self.joy_of_data_img)
         self.assertTrue(isinstance(easy_ocr_op.input, ImageResult))
-        self.assertTrue(isinstance(output, OCRResult))
+        self.assertTrue(isinstance(output, OCRImageResult))
         self.assertEqual(output.to_text_list(), ["joy", "of", "data"])
         output = easy_ocr_op.exec(self.blank_card_img)
-        self.assertTrue(isinstance(output, OCRResult))
+        self.assertTrue(isinstance(output, OCRImageResult))
         self.assertEqual(output.to_text_list(), [])
 
         # test pytesseract on test images
         output = pytesseract_op.exec(self.joy_of_data_img)
         self.assertTrue(isinstance(easy_ocr_op.input, ImageResult))
-        self.assertTrue(isinstance(output, OCRResult))
+        self.assertTrue(isinstance(output, OCRImageResult))
         self.assertEqual(output.to_text_list(), ["joy of data\n"])
         output = pytesseract_op.exec(self.blank_card_img)
-        self.assertTrue(isinstance(output, OCRResult))
+        self.assertTrue(isinstance(output, OCRImageResult))
         self.assertEqual(output.to_text_list(), [" \n\n \n"])
         for autosave_file in ("blank_card.txt", "joy_of_data.txt"):
             self.assertTrue(
@@ -162,8 +162,8 @@ class TestOCROps(unittest.TestCase):
 
         # test that spatial bounding boxes overlap significantly between the two OCR methods for the same detected
         # text on joy of data image
-        output1: OCRResult = easy_ocr_op.exec(self.joy_of_data_img)
-        output2: OCRResult = pytesseract_op.exec(self.joy_of_data_img)
+        output1: OCRImageResult = easy_ocr_op.exec(self.joy_of_data_img)
+        output2: OCRImageResult = pytesseract_op.exec(self.joy_of_data_img)
         output2.text_boxes = [
             output
             for output in output2
@@ -205,8 +205,8 @@ class TestOCROps(unittest.TestCase):
             )
 
         # test that nothing is detected in blank image
-        output1: OCRResult = easy_ocr_op.exec(self.blank_card_img)
-        output2: OCRResult = pytesseract_op.exec(self.blank_card_img)
+        output1: OCRImageResult = easy_ocr_op.exec(self.blank_card_img)
+        output2: OCRImageResult = pytesseract_op.exec(self.blank_card_img)
         output2.text_boxes = [
             output
             for output in output2
