@@ -12,7 +12,7 @@ def _gray_scale(img: np.array) -> np.array:
 def _invert_black_channel(img: np.array) -> np.array:
     # extract black channel in CMYK color space
     # (after this transformation, it appears white)
-    img_float = img.astype(np.float) / 255.0
+    img_float = img.astype(float) / 255.0
     k_channel = 1 - np.max(img_float, axis=2)
     k_channel = (255 * k_channel).astype(np.uint8)
     return k_channel

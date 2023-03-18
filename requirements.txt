@@ -1,12 +1,13 @@
 algo-ops
 easyocr
+torch==1.11.0
+torchvision==0.12.0
 pytesseract
 numpy
 natsort
 pyspellchecker
-opencv-python-headless==4.5.4.60
 shapely
 ezplotly
 black
 twine
-nose
+nose2
