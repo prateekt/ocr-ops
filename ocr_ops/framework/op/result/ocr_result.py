@@ -112,7 +112,7 @@ class OCRImageResult:
 
     def update_words(self) -> None:
         """
-        Updates words with latest information from text boxes.
+        Updates words with the latest information from text boxes.
         """
         words: List[str] = list()
         for text_box in self.text_boxes:

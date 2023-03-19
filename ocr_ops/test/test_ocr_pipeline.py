@@ -363,7 +363,7 @@ class TestOCRPipeline(unittest.TestCase):
         cv_pipeline.to_pickle(out_pkl_path="test.pkl")
 
     @iter_params(pipeline_init=(basic_text_cleaning_pipeline,))
-    def test_textpipeline_instances(self, pipeline_init: Callable) -> None:
+    def test_text_pipeline_instances(self, pipeline_init: Callable) -> None:
         """
         Test text cleaning pipeline instances.
         """

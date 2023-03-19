@@ -164,12 +164,12 @@ class EasyOCRTextBoxOp(EasyOCROp, TextBoxOCROp):
         text_boxes: List[TextBox] = list()
         for ocr_output in ocr_outputs:
             text = ocr_output[1]
-            minx = ocr_output[0][0][0]
-            miny = ocr_output[0][0][1]
-            maxx = ocr_output[0][2][0]
-            maxy = ocr_output[0][2][1]
+            min_x = ocr_output[0][0][0]
+            min_y = ocr_output[0][0][1]
+            max_x = ocr_output[0][2][0]
+            max_y = ocr_output[0][2][1]
             conf = ocr_output[2]
-            bounding_box: Polygon = box(minx=minx, miny=miny, maxx=maxx, maxy=maxy)
+            bounding_box: Polygon = box(minx=min_x, miny=min_y, maxx=max_x, maxy=max_y)
             text_box = TextBox(text=text, bounding_box=bounding_box, conf=conf)
             text_boxes.append(text_box)
         output = OCRImageResult(

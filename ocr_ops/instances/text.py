@@ -12,7 +12,6 @@ from ocr_ops.framework.op.result.ocr_result import OCRImageResult
 def _extract_confident_text_from_ocr_result(
     ocr_result: Union[OCRImageResult, str, List[str]]
 ) -> List[str]:
-
     # convert to List[str] if already string-only
     if isinstance(ocr_result, str):
         return [ocr_result]
@@ -48,7 +47,7 @@ def _resplit_new_lines(words: List[str]) -> List[str]:
 
 
 def _retokenize_text(text: List[str]) -> List[str]:
-    # retokenizes text into words
+    # re-tokenizes text into words
     all_words: List[str] = list()
     for phrase in text:
         words = _tokenize_text(text=phrase)
@@ -115,7 +114,8 @@ class OCRResultUpdater:
     @classmethod
     def prepare_updater(cls, base_func: Callable) -> Callable:
         """
-        Prepares updater function that changes OCRPipelineResult based on text-processing function that operates on List[str].
+        Prepares updater function that changes OCRPipelineResult based on
+        text-processing function that operates on List[str].
 
         param base_func: The base text-processing function.
 

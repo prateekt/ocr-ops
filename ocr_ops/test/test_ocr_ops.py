@@ -29,7 +29,6 @@ class TestOCROps(unittest.TestCase):
         )
 
     def setUp(self) -> None:
-
         # paths
         dir_path = os.path.dirname(os.path.realpath(__file__))
         self.joy_of_data_img = os.path.join(dir_path, "data", "joy_of_data.png")

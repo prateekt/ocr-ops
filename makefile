@@ -13,3 +13,9 @@ deploy:
 
 test:
 	nose2
+
+clean:
+	rm -rf dist
+	rm -rf build
+	rm -rf ocr_ops.egg*
+	rm -rf .pytest_cache
