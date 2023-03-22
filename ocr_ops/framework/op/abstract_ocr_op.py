@@ -58,6 +58,7 @@ class AbstractOCROp(Op, ABC):
         return:
             OCR Result
         """
+
         # parse input into ImageResult object
         input_img_result = CVOp.parse_input(inp=inp)
         if input_img_result.file_path is not None:

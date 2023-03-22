@@ -2,6 +2,7 @@ from typing import Optional, List
 
 import cv2
 import numpy as np
+import pandas as pd
 from algo_ops.ops.cv import ImageResult
 from shapely.geometry import Polygon
 
@@ -176,3 +177,31 @@ class OCRPipelineResult:
 
     def __len__(self) -> int:
         return len(self.ocr_image_results)
+
+    def to_csv(self, outfile: str) -> None:
+        """
+        Saves OCR results to a CSV file.
+
+        param outfile: Path to output CSV file
+        """
+
+        # prepare dataframe of bounding box results
+        input_paths = list()
+        texts = list()
+        bounding_boxes = list()
+        confidences = list()
+        for ocr_result in self.ocr_image_results:
+            for bounding_box in ocr_result.text_boxes:
+                input_paths.append(ocr_result.input_img.file_path)
+                texts.append(bounding_box.text)
+                bounding_boxes.append(bounding_box.bounding_box)
+                confidences.append(bounding_box.conf)
+        df = pd.DataFrame(
+            {
+                "input_path": input_paths,
+                "text": texts,
+                "bounding_box": bounding_boxes,
+                "confidence": confidences,
+            }
+        )
+        df.to_csv(outfile, index=False)
