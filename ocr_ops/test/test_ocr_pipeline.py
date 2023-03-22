@@ -4,6 +4,7 @@ from typing import Callable
 
 import ezplotly.settings as plot_settings
 import numpy as np
+import pandas as pd
 from algo_ops.dependency.tester_util import iter_params, clean_paths
 from algo_ops.ops.cv import ImageResult
 from algo_ops.pipeline.cv_pipeline import CVPipeline
@@ -279,16 +280,16 @@ class TestOCRPipeline(unittest.TestCase):
         # test execution on sample image
         output = ocr_pipeline.exec(self.joy_of_data_img)
         self.assertTrue(isinstance(output, OCRPipelineResult))
-        output = output[0]
-        self.assertTrue(isinstance(output, OCRImageResult))
-        self.assertTrue(output.use_bounding_box)
-        self.assertFalse(np.array_equal(output.input_img.img, output.output_img))
-        self.assertEqual(len(output), 3)
+        image_result = output[0]
+        self.assertTrue(isinstance(image_result, OCRImageResult))
+        self.assertTrue(image_result.use_bounding_box)
+        self.assertFalse(np.array_equal(image_result.input_img.img, image_result.output_img))
+        self.assertEqual(len(image_result), 3)
         for i, word in enumerate(["joy", "of", "data"]):
-            self.assertTrue(isinstance(output[i], TextBox))
-            self.assertEqual(output[i].text, word)
-            self.assertTrue(isinstance(output[i].bounding_box, Polygon))
-            self.assertTrue(isinstance(output[i].conf, float))
+            self.assertTrue(isinstance(image_result[i], TextBox))
+            self.assertEqual(image_result[i].text, word)
+            self.assertTrue(isinstance(image_result[i].bounding_box, Polygon))
+            self.assertTrue(isinstance(image_result[i].conf, float))
 
         # test save and vis
         self._assert_pass_save_tests(
@@ -303,6 +304,14 @@ class TestOCRPipeline(unittest.TestCase):
 
         # test pickle
         ocr_pipeline.to_pickle(out_pkl_path="test.pkl")
+
+        # test save to csv
+        output.to_csv(outfile="test.csv")
+        self.assertTrue(os.path.exists("test.csv"))
+        df = pd.read_csv("test.csv")
+        self.assertEqual(len(df), 3)
+        self.assertTrue(np.array_equal(df["text"].values, ["joy", "of", "data"]))
+        os.unlink("test.csv")
 
     @iter_params(
         ocr_method=(OCRMethod.EASYOCR, OCRMethod.PYTESSERACT),
