@@ -306,7 +306,7 @@ class TestOCRPipeline(unittest.TestCase):
         ocr_pipeline.to_pickle(out_pkl_path="test.pkl")
 
         # test save to csv
-        output.to_csv(outfile="test.csv")
+        output.to_df().to_csv("test.csv")
         self.assertTrue(os.path.exists("test.csv"))
         df = pd.read_csv("test.csv")
         self.assertEqual(len(df), 3)
