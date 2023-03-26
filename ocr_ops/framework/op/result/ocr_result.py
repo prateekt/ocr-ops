@@ -178,11 +178,9 @@ class OCRPipelineResult:
     def __len__(self) -> int:
         return len(self.ocr_image_results)
 
-    def to_csv(self, outfile: str) -> None:
+    def to_df(self) -> pd.DataFrame:
         """
-        Saves OCR results to a CSV file.
-
-        param outfile: Path to output CSV file
+        Convert OCR results to pandas dataframe containing one row per detected text box.
         """
 
         # prepare dataframe of bounding box results
@@ -204,4 +202,4 @@ class OCRPipelineResult:
                 "confidence": confidences,
             }
         )
-        df.to_csv(outfile, index=False)
+        return df
