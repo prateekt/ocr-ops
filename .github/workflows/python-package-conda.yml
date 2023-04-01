@@ -21,6 +21,7 @@ jobs:
         auto-activate-base: false
     - name: Install linux dependencies
       run: |
+        sudo apt update
         sudo apt install ffmpeg
         sudo apt install tesseract-ocr
         sudo apt install libtesseract-dev        
