@@ -19,6 +19,11 @@ jobs:
         environment-file: conda.yaml
         python-version: 3.9.16
         auto-activate-base: false
+    - name: Install linux dependencies
+      run: |
+        sudo apt install ffmpeg
+        sudo apt install tesseract-ocr
+        sudo apt install libtesseract-dev        
     - name: Test with nose2
       run: |
         nose2
