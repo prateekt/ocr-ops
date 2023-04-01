@@ -35,6 +35,7 @@ class OutputType(Enum):
 
     # just raw text
     TEXT = 0
+
     # textbox information w/ bounding boxes
     TEXTBOX = 1
 
@@ -151,17 +152,17 @@ class OCRPipeline(Pipeline):
         """
         input_path = input_path
         if not os.path.exists(input_path):
-            raise ValueError("input_path " + str(input_path) + " does not exist.")
+            raise ValueError("Input_path " + str(input_path) + " does not exist.")
         if os.path.isdir(input_path):
             files = get_image_files(images_dir=input_path)
             if len(files) == 0:
                 raise ValueError(
-                    "input_path " + str(input_path) + " contains no image files."
+                    "Input_path " + str(input_path) + " contains no image files."
                 )
         else:
             if not is_image_file(input_path):
                 raise ValueError(
-                    "input_path " + str(input_path) + " is not an image file."
+                    "Input_path " + str(input_path) + " is not an image file."
                 )
             files = [input_path]
         return files
@@ -179,14 +180,20 @@ class OCRPipeline(Pipeline):
         if isinstance(inp, FFMPEGResult):
             images_path = inp.output_images_path
             original_input_path = inp.input_video_path
-        else:
+        elif isinstance(inp, str):
             images_path = inp
             original_input_path = inp
+        else:
+            raise ValueError("Unknown input type: " + str(type(inp)))
         files = self._parse_image_files_list_from_input(input_path=images_path)
+
+        # run OCR on each file
         ocr_img_results: List[OCRImageResult] = paraloop.loop(
             func=super().exec, params=files, mechanism=self.parallel_mechanism
         )
         self.input = images_path
+
+        # prepare output and return
         return OCRPipelineResult(
             ocr_image_results=ocr_img_results, input_path=original_input_path
         )
@@ -197,6 +204,7 @@ class OCRPipeline(Pipeline):
 
         param out_pkl_path: Path to where pickle file should go
         """
+
         # temporarily remove un-pickleable elements
         easy_ocr_instance = None
         if isinstance(self.ocr_op, EasyOCROp):
