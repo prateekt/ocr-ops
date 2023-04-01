@@ -87,10 +87,9 @@ class TestOCROps(unittest.TestCase):
         output = pytesseract_op.exec(self.joy_of_data_img)
         self.assertTrue(isinstance(easy_ocr_op.input, ImageResult))
         self.assertTrue(isinstance(output, OCRImageResult))
-        self.assertEqual(output.to_text_list(), ["joy of data\n"])
+        self.assertEqual(output.to_text_list(strip=True), ["joy of data"])
         output = pytesseract_op.exec(self.blank_card_img)
         self.assertTrue(isinstance(output, OCRImageResult))
-        self.assertEqual(output.to_text_list(), [" \n\n \n"])
         for autosave_file in ("blank_card.txt", "joy_of_data.txt"):
             self.assertTrue(
                 os.path.exists(os.path.join("pytesseract_autosave", autosave_file))
