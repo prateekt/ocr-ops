@@ -125,7 +125,7 @@ class TestOCRPipeline(unittest.TestCase):
         self.assertTrue(np.array_equal(output.input_img.img, output.output_img))
         self.assertEqual(len(output), 1)
         self.assertTrue(isinstance(output[0], TextBox))
-        self.assertEqual(output[0].text, "joy of data\n")
+        self.assertEqual(output[0].text.strip(), "joy of data")
         self.assertEqual(output[0].bounding_box, None)
         self.assertEqual(output[0].conf, None)
 

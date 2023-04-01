@@ -146,14 +146,17 @@ class OCRImageResult:
     def __len__(self) -> int:
         return len(self.text_boxes)
 
-    def to_text_list(self) -> List[str]:
+    def to_text_list(self, strip: bool = False) -> List[str]:
         """
         Returns just the text detected in TextBoxes as list of strings.
 
         return:
             Detected text as list of strings
         """
-        return [text_box.text for text_box in self.text_boxes]
+        return [
+            text_box.text.strip() if strip else text_box.text
+            for text_box in self.text_boxes
+        ]
 
 
 class OCRPipelineResult:
