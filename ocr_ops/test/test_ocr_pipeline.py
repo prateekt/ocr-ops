@@ -283,7 +283,9 @@ class TestOCRPipeline(unittest.TestCase):
         image_result = output[0]
         self.assertTrue(isinstance(image_result, OCRImageResult))
         self.assertTrue(image_result.use_bounding_box)
-        self.assertFalse(np.array_equal(image_result.input_img.img, image_result.output_img))
+        self.assertFalse(
+            np.array_equal(image_result.input_img.img, image_result.output_img)
+        )
         self.assertEqual(len(image_result), 3)
         for i, word in enumerate(["joy", "of", "data"]):
             self.assertTrue(isinstance(image_result[i], TextBox))
