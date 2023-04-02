@@ -9,7 +9,66 @@ from ocr_ops.run_finding.run_finding import (
 
 
 class TestRunFinding(unittest.TestCase):
+
+    def test_interval(self) -> None:
+        """
+        Test interval class.
+        """
+
+        # test interval properties
+        interval = Interval(0, 1)
+        self.assertEqual(interval.start, 0)
+        self.assertEqual(interval.end, 1)
+        self.assertEqual(interval.__str__(), "0-1")
+        self.assertEqual(interval.__eq__(Interval(0, 1)), True)
+        self.assertEqual(interval.__eq__(Interval(1, 1)), False)
+        self.assertEqual(interval.__eq__(Interval(0, 2)), False)
+        self.assertEqual(interval.__eq__(Interval(1, 2)), False)
+        self.assertEqual(len(interval), 1)
+
+        # test two adjacent intervals
+        interval_1 = Interval(0, 1)
+        interval_2 = Interval(1, 2)
+        self.assertEqual(interval_1.is_disjoint(interval_2), True)
+        self.assertEqual(interval_2.is_disjoint(interval_1), True)
+
+        # test interval equals
+        interval_1 = Interval(0, 1)
+        interval_2 = Interval(0, 1)
+        self.assertEqual(interval_1.equals(interval_2), True)
+
+        # test interval contains
+        interval_1 = Interval(0, 1)
+        self.assertEqual(interval_1.contains(0), True)
+        self.assertEqual(interval_1.contains(1), False)
+        self.assertEqual(interval_1.contains(2), False)
+
+        # test interval intersects
+        interval_1 = Interval(0, 1)
+        interval_2 = Interval(1, 2)
+        self.assertEqual(interval_1.intersects(interval_2), False)
+        self.assertEqual(interval_2.intersects(interval_1), False)
+
+        # test interval area overlap
+        interval_1 = Interval(0, 1)
+        interval_2 = Interval(1, 2)
+        with self.assertRaises(ValueError):
+            interval_1.overlap_interval(interval_2)
+        with self.assertRaises(ValueError):
+            interval_2.overlap_interval(interval_1)
+        interval_1 = Interval(0, 2)
+        interval_2 = Interval(1, 3)
+        self.assertEqual(interval_1.overlap_interval(interval_2), Interval(1, 2))
+
+        # test interval percent overlap
+        interval_1 = Interval(0, 2)
+        interval_2 = Interval(1, 3)
+        self.assertEqual(interval_1.percent_overlap(interval_2), 0.5)
+
     def test_uninterrupted_runs(self) -> None:
+        """
+        Test uninterrupted runs.
+        """
         # test basic
         series = [1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 3]
         runs_1 = find_uninterrupted_runs(series=series, query_elem=1)
@@ -55,6 +114,9 @@ class TestRunFinding(unittest.TestCase):
         self.assertListEqual(runs_3, [Interval(2, 3)])
 
     def test_stitcher(self) -> None:
+        """
+        Test stitcher.
+        """
         # basic test
         runs = [
             Interval(0, 1),
@@ -85,6 +147,9 @@ class TestRunFinding(unittest.TestCase):
             stitch_with_tol(runs, tol=-1)
 
     def test_find_runs_with_tol(self) -> None:
+        """
+        Test find runs with tolerance.
+        """
         # test basic
         series = [1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 3]
         self.assertListEqual(
