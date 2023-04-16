@@ -194,7 +194,7 @@ class OCRPipelineResult:
         for ocr_result in self.ocr_image_results:
             for bounding_box in ocr_result.text_boxes:
                 if ocr_result.input_img is None:
-                    input_paths.append('N/A')
+                    input_paths.append("N/A")
                 else:
                     input_paths.append(ocr_result.input_img.file_path)
                 texts.append(bounding_box.text)
