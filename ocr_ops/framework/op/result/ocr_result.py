@@ -88,9 +88,9 @@ class OCRImageResult:
         param use_bounding_box: Whether bounding box annotations are used
         """
         self.text_boxes: List[TextBox] = text_boxes
-        self.input_img: ImageResult = input_img
+        self.input_img: Optional[ImageResult] = input_img
         self.use_bounding_box = use_bounding_box
-        self.output_img: np.array = self._prepare_output_image()
+        self.output_img: Optional[np.array] = self._prepare_output_image()
         self.words: List[str] = list()
         self.update_words()
 
@@ -193,7 +193,10 @@ class OCRPipelineResult:
         confidences = list()
         for ocr_result in self.ocr_image_results:
             for bounding_box in ocr_result.text_boxes:
-                input_paths.append(ocr_result.input_img.file_path)
+                if ocr_result.input_img is None:
+                    input_paths.append("N/A")
+                else:
+                    input_paths.append(ocr_result.input_img.file_path)
                 texts.append(bounding_box.text)
                 bounding_boxes.append(bounding_box.bounding_box)
                 confidences.append(bounding_box.conf)

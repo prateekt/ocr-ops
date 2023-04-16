@@ -168,6 +168,8 @@ class TextBoxOCROp(AbstractOCROp, ABC):
         param basename: File basename
         """
         if self.output is not None:
+            if self.output.output_img is None:
+                raise ValueError("Input image is None.")
             if out_path.endswith(".png"):
                 outfile = out_path
             else:
