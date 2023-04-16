@@ -4,7 +4,6 @@ from typing import Optional, Dict, Any, List, Union
 
 from algo_ops.dependency.sys_util import get_image_files, is_image_file
 from algo_ops.ops.op import Op
-from algo_ops.ops.text import TextOp
 from algo_ops.paraloop import paraloop
 from algo_ops.pipeline.cv_pipeline import CVPipeline
 from algo_ops.pipeline.pipeline import Pipeline

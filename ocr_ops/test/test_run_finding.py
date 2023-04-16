@@ -176,17 +176,14 @@ class TestRunFinding(unittest.TestCase):
         # test 1 elem
         series = [1]
         self.assertListEqual(
-            find_runs_with_tol(series=series, query_elem=1, tol=1),
-            [Interval(0, 1)],
+            find_runs_with_tol(series=series, query_elem=1, tol=1), [Interval(0, 1)],
         )
         self.assertListEqual(
-            find_runs_with_tol(series=series, query_elem=2, tol=1),
-            [],
+            find_runs_with_tol(series=series, query_elem=2, tol=1), [],
         )
 
         # test empty
         series = []
         self.assertListEqual(
-            find_runs_with_tol(series=series, query_elem=1, tol=1),
-            [],
+            find_runs_with_tol(series=series, query_elem=1, tol=1), [],
         )

@@ -9,11 +9,15 @@ from ocr_ops.instances.cv import (
 from ocr_ops.instances.text import basic_text_cleaning_pipeline
 
 
-def basic_ocr_pipeline(autosave_output_img_path: Optional[str] = None) -> OCRPipeline:
+def basic_ocr_pipeline(
+    autosave_output_img_path: Optional[str] = None,
+    store_intermediate_images: bool = True,
+) -> OCRPipeline:
     """
     Initializes basic PyTesseract OCR pipeline.
 
     param autosave_output_img_path: If specified, the place where OCR output images will be auto-saved.
+    param store_intermediate_images: If True, intermediate images will be stored in the OCRPipelineResult.
 
     return:
         OCRPipeline
@@ -24,6 +28,7 @@ def basic_ocr_pipeline(autosave_output_img_path: Optional[str] = None) -> OCRPip
         output_type=OutputType.TEXT,
         text_pipeline=None,
         autosave_output_img_path=autosave_output_img_path,
+        store_intermediate_images=store_intermediate_images,
     )
     return ocr_pipeline
 
@@ -32,6 +37,7 @@ def basic_ocr_with_text_cleaning_pipeline(
     vocab_words: Set[str],
     ocr_method: OCRMethod = OCRMethod.PYTESSERACT,
     autosave_output_img_path: Optional[str] = None,
+    store_intermediate_images: bool = True,
 ) -> OCRPipeline:
     """
     Initializes basic PyTesseract OCR pipeline.
@@ -39,6 +45,7 @@ def basic_ocr_with_text_cleaning_pipeline(
     param vocab_words: The set of vocab words to accept
     param ocr_method: The OCR Method to use
     param autosave_output_img_path: If specified, the place where OCR output images will be auto-saved.
+    param store_intermediate_images: If True, intermediate images will be stored in the OCRPipelineResult.
 
     return:
         OCRPipeline
@@ -50,6 +57,7 @@ def basic_ocr_with_text_cleaning_pipeline(
         output_type=OutputType.TEXTBOX,
         text_pipeline=basic_text_cleaning_pipeline(),
         autosave_output_img_path=autosave_output_img_path,
+        store_intermediate_images=store_intermediate_images,
     )
     ocr_pipeline.set_text_pipeline_params(
         func_name="_check_vocab", params={"vocab_words": vocab_words}
@@ -60,12 +68,14 @@ def basic_ocr_with_text_cleaning_pipeline(
 def black_text_ocr_pipeline(
     ocr_method: OCRMethod = OCRMethod.PYTESSERACT,
     autosave_output_img_path: Optional[str] = None,
+    store_intermediate_images: bool = True,
 ) -> OCRPipeline:
     """
     Initializes pipeline to OCR black text.
 
-    param ocr_method: The OCR Method to use
+    param ocr_method: The OCR Method to use.
     param autosave_output_img_path: If specified, the place where OCR output images will be auto-saved.
+    param store_intermediate_images: If True, intermediate images will be stored in the OCRPipelineResult.
 
     return:
         OCRPipeline
@@ -76,6 +86,7 @@ def black_text_ocr_pipeline(
         output_type=OutputType.TEXTBOX,
         text_pipeline=basic_text_cleaning_pipeline(),
         autosave_output_img_path=autosave_output_img_path,
+        store_intermediate_images=store_intermediate_images,
     )
     return ocr_pipeline
 
@@ -83,12 +94,14 @@ def black_text_ocr_pipeline(
 def white_text_ocr_pipeline(
     ocr_method: OCRMethod = OCRMethod.PYTESSERACT,
     autosave_output_img_path: Optional[str] = None,
+    store_intermediate_images: bool = True,
 ) -> OCRPipeline:
     """
     Initializes pipeline to OCR white text.
 
     param ocr_method: The OCR Method to use
     param autosave_output_img_path: If specified, the place where OCR output images will be auto-saved.
+    param store_intermediate_images: If True, intermediate images will be stored in the OCRPipelineResult.
 
     return:
         OCRPipeline
@@ -99,5 +112,6 @@ def white_text_ocr_pipeline(
         output_type=OutputType.TEXTBOX,
         text_pipeline=basic_text_cleaning_pipeline(),
         autosave_output_img_path=autosave_output_img_path,
+        store_intermediate_images=store_intermediate_images,
     )
     return ocr_pipeline
