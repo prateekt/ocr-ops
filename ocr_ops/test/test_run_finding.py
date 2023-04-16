@@ -9,7 +9,6 @@ from ocr_ops.run_finding.run_finding import (
 
 
 class TestRunFinding(unittest.TestCase):
-
     def test_interval(self) -> None:
         """
         Test interval class.

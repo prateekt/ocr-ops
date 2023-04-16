@@ -52,15 +52,21 @@ class TestOCRPipeline(unittest.TestCase):
             files=("test.pkl",),
         )
 
-    def _assert_pass_vis_tests(self, ocr_pipeline: OCRPipeline) -> None:
+    def _assert_pass_vis_tests(
+        self,
+        ocr_pipeline: OCRPipeline,
+        file_list=None,
+    ) -> None:
         # test vis input / output
+        if file_list is None:
+            file_list = ["['run_ocr']", "['run_ocr']_violin", "run_ocr"]
         with self.assertRaises(ValueError):
             ocr_pipeline.vis_input()
         ocr_pipeline.vis()
 
         # test vis profile
         ocr_pipeline.vis_profile()
-        for file in ["['run_ocr']", "['run_ocr']_violin", "run_ocr"]:
+        for file in file_list:
             self.assertTrue(
                 os.path.exists(os.path.join("algo_ops_profile", file + ".png"))
             )
@@ -121,6 +127,7 @@ class TestOCRPipeline(unittest.TestCase):
         self.assertTrue(isinstance(output, OCRPipelineResult))
         output = output[0]
         self.assertTrue(isinstance(output, OCRImageResult))
+        self.assertTrue(isinstance(output.input_img, ImageResult))
         self.assertFalse(output.use_bounding_box)
         self.assertTrue(np.array_equal(output.input_img.img, output.output_img))
         self.assertEqual(len(output), 1)
@@ -230,7 +237,6 @@ class TestOCRPipeline(unittest.TestCase):
         self.assertTrue(isinstance(output[0], OCRImageResult))
         output = output[0]
         self.assertFalse(output.use_bounding_box)
-        self.assertTrue(np.array_equal(output.input_img.img, output.output_img))
         self.assertEqual(len(output), 3)
         for i, word in enumerate(["joy", "of", "data"]):
             self.assertTrue(isinstance(output[i], TextBox))
@@ -252,7 +258,8 @@ class TestOCRPipeline(unittest.TestCase):
         # test pickle
         ocr_pipeline.to_pickle(out_pkl_path="test.pkl")
 
-    def test_easyocr_textbox_pipeline(self) -> None:
+    @iter_params(store_intermediate_images=[True, False])
+    def test_easyocr_textbox_pipeline(self, store_intermediate_images: bool) -> None:
         """
         Test EasyOCR TextBox pipeline.
         """
@@ -264,6 +271,7 @@ class TestOCRPipeline(unittest.TestCase):
             output_type=OutputType.TEXTBOX,
             text_pipeline=None,
             autosave_output_img_path="easyocr_autosave",
+            store_intermediate_images=store_intermediate_images,
         )
         self.assertTrue(isinstance(ocr_pipeline.ocr_op, EasyOCRTextBoxOp))
         self.assertEqual(ocr_pipeline.input, None)
@@ -282,10 +290,16 @@ class TestOCRPipeline(unittest.TestCase):
         self.assertTrue(isinstance(output, OCRPipelineResult))
         image_result = output[0]
         self.assertTrue(isinstance(image_result, OCRImageResult))
+        if store_intermediate_images:
+            self.assertTrue(isinstance(image_result.input_img, ImageResult))
+            self.assertTrue(isinstance(image_result.output_img, np.ndarray))
+            self.assertFalse(
+                np.array_equal(image_result.input_img.img, image_result.output_img)
+            )
+        else:
+            self.assertEqual(image_result.input_img, None)
+            self.assertEqual(image_result.output_img, None)
         self.assertTrue(image_result.use_bounding_box)
-        self.assertFalse(
-            np.array_equal(image_result.input_img.img, image_result.output_img)
-        )
         self.assertEqual(len(image_result), 3)
         for i, word in enumerate(["joy", "of", "data"]):
             self.assertTrue(isinstance(image_result[i], TextBox))
@@ -294,10 +308,23 @@ class TestOCRPipeline(unittest.TestCase):
             self.assertTrue(isinstance(image_result[i].conf, float))
 
         # test save and vis
-        self._assert_pass_save_tests(
-            ocr_pipeline=ocr_pipeline, expected_num_txt=0, expected_num_png=2
-        )
-        self._assert_pass_vis_tests(ocr_pipeline=ocr_pipeline)
+        if store_intermediate_images:
+            self._assert_pass_save_tests(
+                ocr_pipeline=ocr_pipeline, expected_num_txt=0, expected_num_png=2
+            )
+            file_list = None
+        else:
+            with self.assertRaises(ValueError):
+                self._assert_pass_save_tests(
+                    ocr_pipeline=ocr_pipeline, expected_num_txt=0, expected_num_png=2
+                )
+            file_list = [
+                "drop_intermediate_images",
+                "['run_ocr', 'drop_intermediate_images']",
+                "['run_ocr', 'drop_intermediate_images']_violin",
+                "run_ocr",
+            ]
+        self._assert_pass_vis_tests(ocr_pipeline=ocr_pipeline, file_list=file_list)
 
         # test autosave
         self.assertTrue(

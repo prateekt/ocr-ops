@@ -4,11 +4,13 @@ from typing import Optional, Dict, Any, List, Union
 
 from algo_ops.dependency.sys_util import get_image_files, is_image_file
 from algo_ops.ops.op import Op
+from algo_ops.ops.text import TextOp
 from algo_ops.paraloop import paraloop
 from algo_ops.pipeline.cv_pipeline import CVPipeline
 from algo_ops.pipeline.pipeline import Pipeline
 
 from ocr_ops.framework.op.abstract_ocr_op import AbstractOCROp, EasyOCROp
+from ocr_ops.framework.op.drop_op import DropOp
 from ocr_ops.framework.op.ocr_op import (
     PyTesseractTextOCROp,
     PyTesseractTextBoxOCROp,
@@ -88,6 +90,7 @@ class OCRPipeline(Pipeline):
         output_type: OutputType,
         text_pipeline: Optional[Pipeline],
         autosave_output_img_path: Optional[str] = None,
+        store_intermediate_images: bool = True,
     ):
         """
         param img_pipeline: An optional CVOps pre-processing pipeline to run on image before OCR
@@ -117,6 +120,8 @@ class OCRPipeline(Pipeline):
         # text cleaning post-processing
         if self.text_pipeline is not None:
             ops.append(self.text_pipeline)
+        if not store_intermediate_images:
+            ops.append(DropOp())
         super().__init__(ops=ops)
 
     def set_img_pipeline_params(self, func_name: str, params: Dict[str, Any]) -> None:
