@@ -16,7 +16,7 @@ class DropOp(TextOp):
 
         param result: OCRImageResult to drop intermediate images from
         """
-        result.input_img = None
+        result.input_img.img = None
         result.output_img = None
         return result
 

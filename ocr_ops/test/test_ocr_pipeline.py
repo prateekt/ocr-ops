@@ -290,12 +290,14 @@ class TestOCRPipeline(unittest.TestCase):
         self.assertTrue(isinstance(image_result, OCRImageResult))
         if store_intermediate_images:
             self.assertTrue(isinstance(image_result.input_img, ImageResult))
+            self.assertTrue(isinstance(image_result.input_img.img, np.ndarray))
             self.assertTrue(isinstance(image_result.output_img, np.ndarray))
             self.assertFalse(
                 np.array_equal(image_result.input_img.img, image_result.output_img)
             )
         else:
-            self.assertEqual(image_result.input_img, None)
+            self.assertTrue(isinstance(image_result.input_img, ImageResult))
+            self.assertEqual(image_result.input_img.img, None)
             self.assertEqual(image_result.output_img, None)
         self.assertTrue(image_result.use_bounding_box)
         self.assertEqual(len(image_result), 3)
