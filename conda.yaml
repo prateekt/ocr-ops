@@ -2,18 +2,10 @@ name: ocr_ops_env
 channels:
   - defaults
 dependencies:
-  - python=3.9.16
   - pip:
       - algo-ops
       - easyocr
-      - torch==1.11.0
-      - torchvision==0.12.0
       - pytesseract
-      - numpy
-      - natsort
       - pyspellchecker
       - shapely
-      - ezplotly
-      - black
-      - twine
-      - nose2
+      - Pillow==9.5.0
