@@ -7,5 +7,6 @@ requires = [
     "pytesseract",
     "pyspellchecker",
     "shapely",
+    "Pillow==9.5.0",
 ]
 build-backend = "setuptools.build_meta"

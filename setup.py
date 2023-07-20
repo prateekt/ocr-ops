@@ -7,7 +7,7 @@ with open("requirements.txt") as f:
 
 setuptools.setup(
     name="ocr-ops",
-    version="0.0.0.4.2.8",
+    version="0.0.0.4.3.0",
     author="Prateek Tandon",
     author_email="prateek1.tandon@gmail.com",
     description="OCR-Ops",
@@ -20,6 +20,6 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires=">=3.9.7",
+    python_requires=">=3.11.4",
     install_requires=required,
 )
