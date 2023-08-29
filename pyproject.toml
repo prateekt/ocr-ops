@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ocr-ops"
-version = "0.0.0.4.3.2"
+version = "0.0.0.4.3.1"
 authors = [
   { name="Prateek Tandon", email="prateek1.tandon@gmail.com" },
 ]
@@ -23,7 +23,6 @@ dependencies = [
     "pyspellchecker",
     "shapely",
     "Pillow==9.5.0",
-    "ezplotly"
 ]
 
 [tool.hatch.build.targets.sdist]
