@@ -4,18 +4,14 @@ conda_dev:
 
 build:
 	rm -rf dist
-	rm -rf build
-	rm -rf ocr_ops.egg*
-	python setup.py sdist bdist_wheel
+	hatch build
 
-deploy:
-	twine upload dist/*
+publish:
+	hatch publish
 
 test:
 	nose2
 
 clean:
 	rm -rf dist
-	rm -rf build
-	rm -rf ocr_ops.egg*
 	rm -rf .pytest_cache

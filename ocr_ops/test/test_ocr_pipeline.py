@@ -53,7 +53,9 @@ class TestOCRPipeline(unittest.TestCase):
         )
 
     def _assert_pass_vis_tests(
-        self, ocr_pipeline: OCRPipeline, file_list=None,
+        self,
+        ocr_pipeline: OCRPipeline,
+        file_list=None,
     ) -> None:
         # test vis input / output
         if file_list is None:
