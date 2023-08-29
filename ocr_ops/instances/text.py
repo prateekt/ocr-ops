@@ -129,7 +129,7 @@ def _embedded_updater(
     function: Callable,
     ocr_result: Union[OCRImageResult, List[str], str],
     *args,
-    **kwargs
+    **kwargs,
 ) -> OCRImageResult:
     if isinstance(ocr_result, OCRImageResult):
         for text_box in ocr_result.text_boxes:

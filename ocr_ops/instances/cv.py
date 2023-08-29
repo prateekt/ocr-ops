@@ -35,7 +35,9 @@ def basic_cv_pipeline() -> CVPipeline:
     Just gray scale image.
     """
 
-    img_pipeline = CVPipeline.init_from_funcs(funcs=[_gray_scale],)
+    img_pipeline = CVPipeline.init_from_funcs(
+        funcs=[_gray_scale],
+    )
     return img_pipeline
 
 
