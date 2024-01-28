@@ -202,7 +202,7 @@ class OCRPipeline(Pipeline):
             ocr_image_results=ocr_img_results, input_path=original_input_path
         )
 
-    def to_pickle(self, out_pkl_path: str) -> None:
+    def to_pickle(self, out_pkl_path: str, compression: Optional[str] = None) -> None:
         """
         Pickle ocr pipeline to pickle file.
 
@@ -216,7 +216,7 @@ class OCRPipeline(Pipeline):
             self.ocr_op.easy_ocr_reader = None
 
         # super call to pickle
-        super().to_pickle(out_pkl_path=out_pkl_path)
+        super().to_pickle(out_pkl_path=out_pkl_path, compression=compression)
 
         # restore state
         if isinstance(self.ocr_op, EasyOCROp):

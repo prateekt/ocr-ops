@@ -4,13 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ocr-ops"
-version = "0.0.0.4.3.1"
+version = "0.0.0.4.3.2"
 authors = [
   { name="Prateek Tandon", email="prateek1.tandon@gmail.com" },
 ]
 description = "OCR-Ops"
 readme = "README.md"
-requires-python = ">=3.11.4"
+requires-python = "<=3.11.7"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",

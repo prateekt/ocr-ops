@@ -2,6 +2,7 @@ name: ocr_ops_env
 channels:
   - defaults
 dependencies:
+  - python=3.11.7
   - pip:
       - algo-ops
       - easyocr
