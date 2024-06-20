@@ -44,3 +44,34 @@ class FFMPEG:
             squelch_output=squelch_output,
         )
         return ret_code == 0, out_path
+
+    @staticmethod
+    def convert_frames_to_video(
+        frames_path: str,
+        out_video_path: str,
+        fps: int = 10,
+        fmt: str = "out%04d.png",
+        squelch_output: bool = True,
+    ) -> [bool, str]:
+        """
+        Converts frames to video. Returns true if conversion succeeded.
+
+        param video_path: Path to input video file (*.mp4)
+        param out_path: Path to output
+        param fps: Frames per second
+        param fmt: Format string
+        param squelch_output: Whether to squelch output or not
+
+        return:
+            True if conversion succeeded
+            out_path: Path to video
+        """
+        if not out_video_path.endswith(".mp4"):
+            raise ValueError("Output video path must end with .mp4")
+        in_sig = os.path.join(frames_path, fmt)
+        _, ret_code = run_os_command(
+            ["ffmpeg", "-i", in_sig, "-framerate", str(fps),
+                       "-c:v", "libx264", "-pix_fmt", "yuv420p", out_video_path],
+            squelch_output=squelch_output,
+        )
+        return ret_code == 0, out_video_path

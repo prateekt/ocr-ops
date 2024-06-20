@@ -15,10 +15,37 @@ class FFMPEGResult:
 
     def vis(self) -> None:
         print(
-            "FFMEGOp extracted "
+            "FFMPEGOp extracted "
             + str(self.input_video_path)
             + " to "
             + str(self.output_images_path)
+            + " at "
+            + str(self.fps)
+            + "fps."
+        )
+
+
+class FFMPEGMergeResult:
+    """
+    Represents the result of FFMPEGMergeOp.
+    """
+
+    def __init__(self, input_frames_path: str, output_video_path: str, fps: int):
+        """
+        param input_frames_path: Path to input frames directory
+        param output_video_path: Path to where the video is stored
+        param fps: The frame rate to extract at
+        """
+        self.input_frames_path: str = input_frames_path
+        self.output_video_path: str = output_video_path
+        self.fps: int = fps
+
+    def vis(self) -> None:
+        print(
+            "FFMPEGOp extracted "
+            + str(self.input_frames_path)
+            + " to "
+            + str(self.output_video_path)
             + " at "
             + str(self.fps)
             + "fps."
