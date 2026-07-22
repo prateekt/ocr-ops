@@ -22,7 +22,7 @@ dependencies = [
     "pytesseract",
     "pyspellchecker",
     "shapely",
-    "Pillow==9.5.0",
+    "Pillow==12.3.0",
 ]
 
 [tool.hatch.build.targets.sdist]
